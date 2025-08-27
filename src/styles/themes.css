@@ -1,0 +1,88 @@
+:root {
+  /* ===== 深色主题（默认） ===== */
+  /* Element Plus 官方变量，覆盖即可 */
+  --el-color-primary-rgb: 64, 158, 255;
+  --el-color-primary: #0084ff;
+  --el-bg-color: #181818;               /* 主背景（页面/整体）*/
+  --el-bg-color-overlay: #1e1e1e;       /* 弹窗、抽屉、浮层背景 */
+  --el-bg-color-page: #181818;          /* <body> 背景 */
+  --el-text-color-primary: #ffffff;     /* 主文本 */
+  --el-text-color-regular: #b3b3b3;     /* 普通文本 */
+  --el-text-color-secondary: #777777;   /* 次文本/提示 */
+  --el-border-color: #333333;
+  --el-border-color-light: #444444;
+  --el-border-color-lighter: #555555;
+  --el-fill-color: #252525;             /* 表单填充、列表项 hover */
+  --el-fill-color-light: #2a2a2a;
+  --el-fill-color-blank: #181818;       /* 卡片、空白区域 */
+  --el-mask-color: rgba(0, 0, 0, 0.8);  /* 遮罩层 */
+  --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
+
+  /* 自定义语义化背景变量（层级由高到低） */
+  --bg-primary:   #181818;  /* 页面背景 / 最底层容器 */
+  --bg-secondary: #1e1e1e;  /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary:  #252525;  /* 列表项、输入框背景 */
+  --bg-hover:     #2a2a2a;  /* hover 高亮 */
+  --bg-active:    #333333;  /* 激活/按下高亮 */
+
+  /* 文本颜色（按重要程度） */
+  --text-primary:   #ffffff;  /* 主文本 */
+  --text-secondary: #b3b3b3;  /* 副文本 */
+  --text-tertiary:  #777777;  /* 提示文本 */
+  --text-inverse:   #303133;  /* 用于深色背景上的“反色”文字 */
+
+  /* 边框颜色 */
+  --border-light:  #333333;
+  --border-medium: #444444;
+
+  /* 强调色（主题无关，两个主题保持一致） */
+  --accent-blue:   #0084ff;
+  --accent-green:  #42b883;
+  --accent-red:    #ff4757;
+  --accent-purple: #8b5cf6;
+
+  /* 布局尺寸 */
+  --nav-width:     60px;
+  --header-height: 50px;
+  --detail-width:  320px;
+}
+
+/* ===== 浅色主题（通过给 <html> 或 <body> 加 .light 类启用） ===== */
+:root.light {
+  /* Element Plus 官方变量 */
+  --el-color-primary-rgb: 64, 158, 255;
+  --el-color-primary: #0084ff;
+  --el-bg-color: #ffffff;
+  --el-bg-color-overlay: #f5f7fa;
+  --el-bg-color-page: #f5f7fa;
+  --el-text-color-primary: #303133;
+  --el-text-color-regular: #606266;
+  --el-text-color-secondary: #909399;
+  --el-border-color: #dcdfe6;
+  --el-border-color-light: #e4e7ed;
+  --el-border-color-lighter: #ebeef5;
+  --el-fill-color: #f0f2f5;
+  --el-fill-color-light: #f5f7fa;
+  --el-fill-color-blank: #ffffff;
+  --el-mask-color: rgba(0, 0, 0, 0.5);
+  --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
+
+  /* 自定义语义化背景变量 */
+  --bg-primary:   #ffffff;  /* 页面背景 */
+  --bg-secondary: #f5f7fa;  /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary:  #f0f2f5;  /* 列表项、输入框背景 */
+  --bg-hover:     #e6f7ff;  /* hover 高亮（带主题色）*/
+  --bg-active:    #e6f7ff;
+
+  /* 文本颜色 */
+  --text-primary:   #303133;
+  --text-secondary: #606266;
+  --text-tertiary:  #909399;
+  --text-inverse:   #ffffff;  /* 用于浅色背景上的“反色”文字 */
+
+  /* 边框颜色 */
+  --border-light:  #dcdfe6;
+  --border-medium: #e4e7ed;
+
+  /* 强调色保持不变，无需重复定义 */
+}

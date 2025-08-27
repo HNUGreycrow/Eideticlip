@@ -1,0 +1,134 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import About from './about/index.vue';
+import router from '@/router';
+
+const activeModule = ref('clipboard');
+const aboutRef = ref();
+
+const switchModule = (module: string) => {
+  activeModule.value = module;
+  if (module === 'settings') {
+    router.push('/settings');
+  } else if (module === 'clipboard') {
+    router.push('/clipboard');
+  }
+};
+
+const openAbout = () => {
+  aboutRef.value.openAboutDialog();
+}
+</script>
+
+<template>
+  <div class="nav-sidebar">
+    <button 
+      class="nav-item" 
+      :class="{ active: activeModule === 'clipboard' }" 
+      title="剪切板历史" 
+      @click="switchModule('clipboard')"
+    >
+      <i-ep-document-copy />
+      <!-- <span class="nav-badge">24</span> -->
+    </button>
+    <button 
+      class="nav-item" 
+      :class="{ active: activeModule === 'favorites' }" 
+      title="收藏" 
+      @click="switchModule('favorites')"
+    >
+      <i-ep-star />
+    </button>
+    <div class="nav-divider"></div>
+    <button 
+      class="nav-item" 
+      :class="{ active: activeModule === 'settings' }" 
+      title="设置" 
+      @click="switchModule('settings')"
+    >
+      <i-ep-setting />
+    </button>
+    <button 
+      class="nav-item" 
+      :class="{ active: activeModule === 'about' }" 
+      title="关于" 
+      @click="openAbout"
+    >
+      <i-ep-info-filled />
+    </button>
+  </div>
+  <about ref="aboutRef"></about>
+</template>
+
+<style lang="scss" scoped>
+/* 左侧导航栏 - 纯图标模式 */
+.nav-sidebar {
+  width: var(--nav-width);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  height: 100%;
+}
+
+.nav-item {
+  width: 44px;
+  height: 44px;
+  margin: 4px 0;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: var(--bg-active);
+  color: var(--accent-blue);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 20px;
+  background: var(--accent-blue);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-divider {
+  width: 30px;
+  height: 1px;
+  background: var(--border-light);
+  margin-top: auto;
+}
+
+.nav-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--accent-red);
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+}
+</style>
