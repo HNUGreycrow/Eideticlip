@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from "vue";
-import { themeService } from "../../services/theme";
-import type { ThemeType } from "../../services/theme";
+import { themeService } from "../../utils/theme";
+import type { ThemeType } from "../../utils/theme";
+import { checkShortcut } from "@/utils/validate";
 // 使用预加载脚本中暴露的API，而不是直接导入electron
 
 defineOptions({
@@ -13,7 +14,6 @@ const theme = ref<ThemeType>("dark");
 const shortcut = ref("CommandOrControl+Alt+C");
 const tempKeys = ref<string[]>([]);
 const isRecording = ref(false);
-let shortcutUpdateListener: ((event: any, result: any) => void) | null = null;
 const shortcutInput = ref();
 
 // 点击输入框时清空内容并开始记录
@@ -53,16 +53,26 @@ const onKeyDown = (e: KeyboardEvent) => {
 const onKeyUp = (_e: KeyboardEvent) => {
   if (!isRecording.value || tempKeys.value.length === 0) return;
 
-  // 确保至少有一个修饰键
-  if (
-    tempKeys.value.some((key) =>
-      ["CommandOrControl", "Alt", "Shift", "Command"].includes(key)
-    )
-  ) {
-    const newShortcut = tempKeys.value.join("+");
+  const newShortcut = tempKeys.value.join("+");
+  const checkResult = checkShortcut(newShortcut);
+  // 检查设置快捷键
+  if (checkResult.success) {
     if (newShortcut !== shortcut.value) {
       // 临时保存当前快捷键，以便在失败时恢复
       const oldShortcutValue = shortcut.value;
+
+      // 使用once方法注册一次性监听器
+      window.ipcRenderer.once("shortcut-update-result", (_event, result) => {
+        console.log("收到快捷键更新结果:", result);
+        // 取消输入框焦点
+        shortcutInput.value?.blur();
+        if (!result.success) {
+          shortcut.value = result.shortcut || shortcut.value;
+          ElMessage.error(`快捷键设置失败: ${result.error}`);
+        } else {
+          ElMessage.success("快捷键设置成功");
+        }
+      });
 
       // 发送快捷键更新请求
       window.ipcRenderer.send("update-shortcut", {
@@ -75,12 +85,13 @@ const onKeyUp = (_e: KeyboardEvent) => {
       shortcut.value = newShortcut;
     }
   } else {
-    // 当没有修饰键时，显示错误提示
-    ElMessage.warning("快捷键必须包含至少一个修饰键(Ctrl, Alt, Shift)");
+    // 显示错误提示
+    ElMessage.error(checkResult.error);
   }
 
   // 停止记录
   isRecording.value = false;
+  shortcutInput.value?.blur();
 };
 
 // 显示当前按下的按键
@@ -95,30 +106,11 @@ const displayKeys = computed(() => {
 onMounted(() => {
   // 初始化主题值
   theme.value = themeService.currentTheme.value;
-
-  // 设置快捷键更新结果监听器
-  shortcutUpdateListener = (_event: any, result: any) => {
-    console.log("收到快捷键更新结果:", result);
-    if (!result.success) {
-      shortcut.value = result.shortcut || shortcut.value;
-      ElMessage.error(`快捷键设置失败: ${result.error}`);
-    } else {
-      ElMessage.success("快捷键设置成功");
-    }
-    // 取消输入框焦点
-    shortcutInput.value?.blur();
-  };
-
-  window.ipcRenderer.on("shortcut-update-result", shortcutUpdateListener);
 });
 
-// 组件卸载时清理事件监听器
+// 组件卸载时的清理工作
 onUnmounted(() => {
-  // 移除快捷键更新结果监听器
-  if (shortcutUpdateListener) {
-    window.ipcRenderer.off("shortcut-update-result", shortcutUpdateListener);
-    shortcutUpdateListener = null;
-  }
+  // 不再需要移除事件监听器，因为我们使用的是once方法
 });
 
 // 切换主题
@@ -156,10 +148,19 @@ const handleThemeChange = (value: ThemeType) => {
             <span>启动快捷键</span>
             <div class="setting-description">设置应用启动快捷键</div>
           </div>
+          <el-tooltip placement="top-start">
+            <template #content>
+              例如：<br />
+              Ctrl+Alt+C、Ctrl+Shift+V、Alt+` <br />
+              修饰键：Ctrl、Alt、Shift、Win（任选其一或两两组合） <br />
+              普通键：字母 A-Z、数字 0-9、F1-F12 等
+            </template>
+            <el-icon style="margin-right: 10px"><i-ep-Warning /></el-icon>
+          </el-tooltip>
           <el-input
             v-model="displayKeys"
             ref="shortcutInput"
-            style="width: 30%;"
+            style="width: 30%"
             placeholder="点击后按下快捷键"
             @focus="startRecording"
             @blur="onBlur"

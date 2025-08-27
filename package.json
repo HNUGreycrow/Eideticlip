@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build && electron-builder",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sqlite3-rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "better-sqlite3": "^12.2.0",
     "element-plus": "^2.11.1",
     "vue": "^3.4.21",
     "vue-router": "^4.5.1"
@@ -19,6 +21,7 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "electron": "^30.0.1",
     "electron-builder": "^24.13.3",
+    "electron-rebuild": "^3.2.9",
     "sass-embedded": "^1.90.0",
     "typescript": "^5.2.2",
     "unplugin-auto-import": "^20.0.0",

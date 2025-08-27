@@ -1,19 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import DetailPanel from "./components/DetailPanel.vue";
+import { ClipboardItem } from "@/utils/type";
 
 // 定义组件名称，用于keep-alive识别
 defineOptions({
   name: 'clipboard'
 });
-
-interface ClipboardItem {
-  id: number;
-  type: string;
-  content: string;
-  timestamp: Date;
-  size: string;
-}
 
 const activeFilter = ref("all");
 const searchQuery = ref("");
@@ -51,6 +44,11 @@ const selectItem = (item: ClipboardItem) => {
   selectedItem.value = item;
 };
 
+// 关闭详情面板
+const closeDetail = () => {
+  selectedItem.value = null;
+};
+
 // 复制项目
 const copyItem = (item: ClipboardItem, event?: Event) => {
   if (event) event.stopPropagation();
@@ -82,11 +80,7 @@ const deleteItem = (itemOrId: ClipboardItem | number, event?: Event) => {
     .deleteItem(id)
     .then((success) => {
       if (success) {
-        // 从本地数据中删除
-        clipboardData.value = clipboardData.value.filter(
-          (item) => item.id !== id
-        );
-
+        loadClipboardHistory();
         // 如果当前选中的是被删除的项目，则清空选中
         if (selectedItem.value?.id === id) {
           selectedItem.value = null;
@@ -178,9 +172,7 @@ const addClipboardItem = (content: string) => {
 
   // 保存到数据库
   saveClipboardItem(newItem);
-
-  // 添加到数据列表的最前面
-  clipboardData.value.unshift(newItem);
+  loadClipboardHistory();
 };
 
 // 保存剪贴板项目到数据库
@@ -317,10 +309,6 @@ const getTypeLabel = (type: string) => {
   return labels[type] || "文件";
 };
 
-// 关闭详情面板
-const closeDetail = () => {
-  selectedItem.value = null;
-};
 </script>
 
 <template>
