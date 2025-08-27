@@ -19,7 +19,7 @@ import {
   deleteClipboardItem,
   clearClipboardHistory,
   getClipboardHistory,
-} from "./services/database";
+} from "./database/clipboard";
 
 // 在ES模块中模拟CommonJS的require功能（因为Electron有时需要使用CommonJS模块）
 const require = createRequire(import.meta.url);
@@ -123,7 +123,7 @@ function createWindow() {
     clipboard.writeText(text);
     return true;
   });
-  
+
   // 剪贴板监听相关变量
   let lastClipboardContent = clipboard.readText();
   let clipboardWatcher: NodeJS.Timeout | null = null;
@@ -260,24 +260,6 @@ function registerGlobalShortcuts(shortcut: string) {
     return { success: false, error: "快捷键格式无效" };
   }
 
-  // 检查快捷键格式是否完整（必须包含修饰键和普通键）
-  // 常见的修饰键：CommandOrControl, Alt, Shift, Option, Super
-  // 快捷键必须至少包含一个修饰键和一个普通键
-  const modifiers = ["CommandOrControl", "Ctrl", "Alt", "Shift", "Super"];
-  const hasModifier = modifiers.some((mod) => shortcut.includes(mod));
-  const hasNormalKey = /\+[A-Za-z0-9]$/.test(shortcut); // 检查是否以+加上一个普通键结尾
-
-  if (!hasModifier || !hasNormalKey) {
-    return {
-      success: false,
-      error:
-        "格式不正确！请输入带修饰键的组合，例如：\n" +
-        "Ctrl+Alt+C、Ctrl+Shift+V、Alt+`\n" +
-        "修饰键：Ctrl、Alt、Shift、Win（任选其一或两两组合）\n" +
-        "普通键：字母 A-Z、数字 0-9、F1-F12 等",
-    };
-  }
-
   try {
     // 检查快捷键是否已被注册（被其他应用占用）
     if (globalShortcut.isRegistered(shortcut)) {
@@ -326,7 +308,7 @@ app.whenReady().then(() => {
   registerGlobalShortcuts("CommandOrControl+Alt+C");
 
   // 修改启动快捷键
-  ipcMain.on("update-shortcut", (event, { oldShortcut, newShortcut }) => {
+  ipcMain.on("update-shortcut", (_event, { oldShortcut, newShortcut }) => {
     // 先注销旧快捷键
     if (oldShortcut) {
       globalShortcut.unregister(oldShortcut);

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { themeService } from './services/theme';
+import { themeService } from './utils/theme';
 
 onMounted(() => {
   // 初始化主题

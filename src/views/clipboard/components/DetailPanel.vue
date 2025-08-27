@@ -2,7 +2,7 @@
   <div class="detail-panel" :class="{ 'is-open': props.isOpen }">
     <div class="detail-header">
       <h3 class="detail-title">{{ item ? "详情" : "无选中项" }}</h3>
-      <el-button class="detail-close" @click="closeDetail" type="text">
+      <el-button class="detail-close" @click="closeDetail" text>
         <i-ep-Close />
       </el-button>
     </div>
@@ -55,12 +55,9 @@
 </template>
 
 <script setup lang="ts">
-interface Item {
-  id: number;
-  type: string;
-  content: string;
-  timestamp: Date;
-  size: string;
+import { ClipboardItem } from "@/utils/type";
+
+interface Item extends ClipboardItem {
 }
 
 const props = defineProps<{
