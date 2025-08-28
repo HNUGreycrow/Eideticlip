@@ -23,6 +23,7 @@ import {
 
 // 在ES模块中模拟CommonJS的require功能（因为Electron有时需要使用CommonJS模块）
 const require = createRequire(import.meta.url);
+const clipboardEvent = require('clipboard-event');
 // 获取当前文件的目录路径（__dirname在ES模块中需手动定义）
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -49,9 +50,6 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
   : RENDERER_DIST;
-
-// 数据库实例
-let db: any;
 
 // 声明主窗口变量（全局变量避免被垃圾回收）
 let win: BrowserWindow | null;
@@ -126,14 +124,14 @@ function createWindow() {
 
   // 剪贴板监听相关变量
   let lastClipboardContent = clipboard.readText();
-  let clipboardWatcher: NodeJS.Timeout | null = null;
+  
   // 开始监听剪贴板变化
   ipcMain.handle("clipboard-watch-start", () => {
-    if (clipboardWatcher) {
-      clearInterval(clipboardWatcher);
-    }
-    // 每1000毫秒检查一次剪贴板内容
-    clipboardWatcher = setInterval(() => {
+    // 使用clipboard-event库监听剪贴板变化
+    clipboardEvent.startListening();
+    
+    // 监听剪贴板变化事件
+    clipboardEvent.on("change", () => {
       const currentContent = clipboard.readText();
       // 如果内容变化了，通知渲染进程
       if (
@@ -143,16 +141,15 @@ function createWindow() {
         lastClipboardContent = currentContent;
         win?.webContents.send("clipboard-changed", currentContent);
       }
-    }, 2000);
+    });
+    
     return true;
   });
 
   // 停止监听剪贴板变化
   ipcMain.handle("clipboard-watch-stop", () => {
-    if (clipboardWatcher) {
-      clearInterval(clipboardWatcher);
-      clipboardWatcher = null;
-    }
+    // 停止监听剪贴板变化
+    clipboardEvent.stopListening();
     return true;
   });
 
@@ -267,11 +264,12 @@ function registerGlobalShortcuts(shortcut: string) {
     }
     const shortcutRegistered = globalShortcut.register(shortcut, () => {
       if (win) {
-        if (win.isVisible()) {
-          win.hide();
-        } else {
+        if(!win.isFocused() || !win.isVisible()) {
           win.show();
           win.focus(); // 确保窗口获得焦点
+        }
+        else {
+          win.hide();
         }
       } else {
         createWindow();
@@ -295,7 +293,7 @@ app.whenReady().then(() => {
   // 初始化数据库，判断是否为开发环境
   const isDevelopment = !!VITE_DEV_SERVER_URL;
   try {
-    db = initDatabase(isDevelopment);
+    initDatabase(isDevelopment);
   } catch (error) {
     console.error("Failed to initialize database:", error);
   }
@@ -352,6 +350,9 @@ app.on("will-quit", () => {
     tray = null;
   }
 
+  // 停止监听剪贴板
+  clipboardEvent.stopListening();
+  
   // 注销所有快捷键
   globalShortcut.unregisterAll();
 });
