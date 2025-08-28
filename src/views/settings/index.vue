@@ -150,10 +150,10 @@ const handleThemeChange = (value: ThemeType) => {
           </div>
           <el-tooltip placement="top-start">
             <template #content>
-              例如：<br />
-              Ctrl+Alt+C、Ctrl+Shift+V、Alt+` <br />
+              例如：Ctrl+Alt+C、Ctrl+Shift+V、Alt+` <br />
               修饰键：Ctrl、Alt、Shift、Win（任选其一或两两组合） <br />
-              普通键：字母 A-Z、数字 0-9、F1-F12 等
+              普通键：字母 A-Z、数字 0-9、F1-F12 等 <br />
+              请不要和其他应用的快捷键冲突
             </template>
             <el-icon style="margin-right: 10px"><i-ep-Warning /></el-icon>
           </el-tooltip>

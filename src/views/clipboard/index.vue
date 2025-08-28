@@ -39,14 +39,18 @@ const getClipboardData = computed(() => {
   });
 });
 
+let isOpen = false;
+
 // 选择项目
 const selectItem = (item: ClipboardItem) => {
   selectedItem.value = item;
+  isOpen = true;
 };
 
 // 关闭详情面板
 const closeDetail = () => {
   selectedItem.value = null;
+  isOpen = false;
 };
 
 // 复制项目
@@ -140,6 +144,16 @@ const clearAll = () => {
     })
 };
 
+const formatSize = (byte: number) => {
+  if (byte < 1024) {
+    return `${byte} B`;
+  }
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB'];
+  const i = Math.floor(Math.log(byte) / Math.log(k));
+  return `${(byte / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+}
+
 // 添加新的剪贴板项目
 const addClipboardItem = (content: string) => {
   // 检查内容是否已存在
@@ -159,7 +173,7 @@ const addClipboardItem = (content: string) => {
   }
 
   // 计算大小
-  const size = `${new Blob([content]).size}B`;
+  const size = formatSize(new Blob([content]).size);
 
   // 创建新项目
   const newItem: ClipboardItem = {
@@ -286,16 +300,15 @@ const exportData = () => {
 
 // 格式化时间
 const formatTime = (timestamp: Date) => {
-  const now = new Date();
-  const diff = now.getTime() - timestamp.getTime();
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (minutes < 1) return "刚刚";
-  if (minutes < 60) return `${minutes}分钟前`;
-  if (hours < 24) return `${hours}小时前`;
-  return `${days}天前`;
+  return timestamp.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
 };
 
 // 获取类型标签
@@ -406,7 +419,7 @@ const getTypeLabel = (type: string) => {
             :key="item.id"
             class="content-item"
             :class="{ active: selectedItem?.id === item.id }"
-            @click="selectItem(item)"
+            @click="copyItem(item, $event); selectedItem = item"
           >
             <div class="item-icon">
               <el-icon>
@@ -430,10 +443,10 @@ const getTypeLabel = (type: string) => {
             <div class="item-actions">
               <el-button
                 class="item-action-btn"
-                @click.stop="copyItem(item, $event)"
-                title="复制"
+                @click.stop="selectItem(item)"
+                title="查看"
               >
-                <i-ep-Document-Copy />
+                <i-ep-view />
               </el-button>
               <el-button
                 class="item-action-btn"
@@ -451,7 +464,7 @@ const getTypeLabel = (type: string) => {
     <!-- 详情面板 -->
     <DetailPanel
       :item="selectedItem"
-      :is-open="!!selectedItem"
+      :is-open="isOpen"
       @close="closeDetail"
       @copy="copyItem"
       @delete="deleteItem"
