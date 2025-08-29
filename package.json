@@ -13,6 +13,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "better-sqlite3": "^12.2.0",
     "clipboard-event": "^1.6.0",
+    "electron-store": "^10.1.0",
     "element-plus": "^2.11.1",
     "vue": "^3.4.21",
     "vue-router": "^4.5.1"
