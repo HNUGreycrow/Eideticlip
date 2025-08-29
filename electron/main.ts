@@ -1,29 +1,18 @@
-import {
-  app,
-  BrowserWindow,
-  clipboard,
-  ipcMain,
-  Tray,
-  Menu,
-  nativeImage,
-  globalShortcut,
-} from "electron"; // 导入Electron核心模块：app(应用控制)、BrowserWindow(窗口管理)、Tray(系统托盘)、globalShortcut(全局快捷键)
-import { createRequire } from "node:module"; // 导入Node模块：用于在ES模块中创建require函数
+import { app, ipcMain } from "electron"; // 导入Electron核心模块：app(应用控制)
 import { fileURLToPath } from "node:url"; // 导入Node模块：将URL转换为文件路径
 import path from "node:path"; // 导入Node模块：处理文件路径
 // 导入数据库服务
+import { initDatabase, closeDatabase } from "./database/clipboard";
+// 导入自定义服务
 import {
-  initDatabase,
-  closeDatabase,
-  saveClipboardItem,
-  deleteClipboardItem,
-  clearClipboardHistory,
-  getClipboardHistory,
-} from "./database/clipboard";
+  WindowService,
+  TrayService,
+  ClipboardService,
+  ShortcutService,
+  ConfigService,
+} from "./services";
 
-// 在ES模块中模拟CommonJS的require功能（因为Electron有时需要使用CommonJS模块）
-const require = createRequire(import.meta.url);
-const clipboardEvent = require('clipboard-event');
+
 // 获取当前文件的目录路径（__dirname在ES模块中需手动定义）
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -51,127 +40,44 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
   : RENDERER_DIST;
 
-// 声明主窗口变量（全局变量避免被垃圾回收）
-let win: BrowserWindow | null;
-
-// 声明托盘变量（全局变量避免被垃圾回收）
-let tray: Tray | null = null;
+// 声明服务实例（全局变量避免被垃圾回收）
+let windowService: WindowService | null = null;
+let trayService: TrayService | null = null;
+let clipboardService: ClipboardService | null = null;
+let shortcutService: ShortcutService | null = null;
+let configService: ConfigService | null = null;
 
 /**
- * 创建应用主窗口
+ * 清理应用资源
+ * 在应用退出前释放所有资源
  */
-function createWindow() {
-  win = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    minWidth: 800,
-    minHeight: 600,
-    frame: false,
-    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"), // 窗口图标路径
-    show: false, //先不显示窗口，等窗口准备好了才显示，防止渲染未完成时出现白框
-    webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"), // 预加载脚本路径（用于安全地在渲染进程中暴露API）
-    },
-  });
+function disposeServices() {
+  // 关闭数据库连接
+  closeDatabase();
 
-  // 窗口加载完成后，向渲染进程发送测试消息（主进程→渲染进程通信示例）
-  win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("main-process-message", new Date().toLocaleString());
-  });
-
-  // 根据环境加载不同的页面：
-  // 开发环境：加载Vite开发服务器（支持热更新）
-  // 生产环境：加载本地构建好的index.html
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+  // 释放各服务资源
+  if (clipboardService) {
+    clipboardService.dispose();
+    clipboardService = null;
   }
 
-  ipcMain.on("window-minimize", () => {
-    // 最小化时隐藏窗口而不是真正最小化
-    win?.hide();
-  });
+  if (shortcutService) {
+    shortcutService.dispose();
+    shortcutService = null;
+  }
 
-  ipcMain.on("window-maximize", () => {
-    if (win?.isMaximized()) {
-      win.unmaximize();
-    } else {
-      win?.maximize();
-    }
-  });
+  if (trayService) {
+    trayService.dispose();
+    trayService = null;
+  }
 
-  ipcMain.on("window-close", () => {
-    win?.close();
-  });
-
-  win.once("ready-to-show", () => {
-    win?.show();
-  });
-
-  // 创建系统托盘
-  createTray();
-
-  // 剪贴板读写操作
-  ipcMain.handle("clipboard-read", () => {
-    return clipboard.readText();
-  });
-
-  ipcMain.handle("clipboard-write", (_, text) => {
-    clipboard.writeText(text);
-    return true;
-  });
-
-  // 剪贴板监听相关变量
-  let lastClipboardContent = clipboard.readText();
+  if (windowService) {
+    windowService.dispose();
+    windowService = null;
+  }
   
-  // 开始监听剪贴板变化
-  ipcMain.handle("clipboard-watch-start", () => {
-    // 使用clipboard-event库监听剪贴板变化
-    clipboardEvent.startListening();
-    
-    // 监听剪贴板变化事件
-    clipboardEvent.on("change", () => {
-      const currentContent = clipboard.readText();
-      // 如果内容变化了，通知渲染进程
-      if (
-        currentContent !== lastClipboardContent &&
-        currentContent.trim() !== ""
-      ) {
-        lastClipboardContent = currentContent;
-        win?.webContents.send("clipboard-changed", currentContent);
-      }
-    });
-    
-    return true;
-  });
-
-  // 停止监听剪贴板变化
-  ipcMain.handle("clipboard-watch-stop", () => {
-    // 停止监听剪贴板变化
-    clipboardEvent.stopListening();
-    return true;
-  });
-
-  // 保存剪贴板历史（添加单个项目）
-  ipcMain.handle("clipboard-save-item", (_, item) => {
-    return saveClipboardItem(item);
-  });
-
-  // 删除剪贴板历史项目
-  ipcMain.handle("clipboard-delete-item", (_, id) => {
-    return deleteClipboardItem(id);
-  });
-
-  // 清空剪贴板历史
-  ipcMain.handle("clipboard-clear-all", () => {
-    return clearClipboardHistory();
-  });
-
-  // 获取剪贴板历史
-  ipcMain.handle("clipboard-get-history", () => {
-    return getClipboardHistory();
-  });
+  // 配置服务不需要特别的清理操作
+  configService = null;
 }
 
 // 监听所有窗口关闭事件：
@@ -180,112 +86,111 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     // darwin是macOS的标识
     app.quit();
-    win = null; // 释放窗口引用
   }
 });
 
 // 监听应用激活事件（主要针对macOS）：
 // 当点击 dock 图标且没有其他窗口打开时，重新创建窗口
 app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+  if (!windowService || !windowService.getWindow()) {
+    initializeServices();
   }
 });
 
 /**
- * 创建系统托盘
+ * 初始化应用服务
+ * 创建并初始化所有服务实例
  */
-function createTray() {
-  // 创建托盘图标
-  const icon = nativeImage.createFromPath(
-    path.join(process.env.VITE_PUBLIC, "20250815110628.png")
+function initializeServices() {
+  // 创建配置服务（最先初始化，因为其他服务可能依赖它）
+  configService = new ConfigService();
+  
+  // 创建窗口服务
+  windowService = new WindowService(
+    path.join(__dirname, "preload.mjs"),
+    process.env.VITE_PUBLIC as string,
+    RENDERER_DIST,
+    configService,
+    VITE_DEV_SERVER_URL,
   );
+  
+  // 创建主窗口
+  const mainWindow = windowService.createWindow();
+  
+  // 创建托盘服务
+  trayService = new TrayService(
+    windowService,
+    path.join(process.env.VITE_PUBLIC as string, "20250815110628.png")
+  );
+  trayService.createTray();
+  
+  // 创建剪贴板服务
+  clipboardService = new ClipboardService(mainWindow);
+  
+  // 创建快捷键服务
+  shortcutService = new ShortcutService(windowService, configService);
+  
+  // 注册保存的快捷键
+  const savedShortcut = configService.get<string>('shortcut');
+  if (savedShortcut) {
+    shortcutService.registerGlobalShortcut(savedShortcut);
+  }
+}
 
-  tray = new Tray(icon);
-  tray.setToolTip("Electron Clipboard Hub");
-
-  // 创建托盘菜单
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "显示",
-      click: () => {
-        if (win) {
-          win.show();
-        }
-      },
-    },
-    {
-      label: "隐藏",
-      click: () => {
-        if (win) {
-          win.hide();
-        }
-      },
-    },
-    { type: "separator" },
-    {
-      label: "退出",
-      click: () => {
-        app.quit();
-      },
-    },
-  ]);
-
-  // 设置托盘菜单
-  tray.setContextMenu(contextMenu);
-
-  // 点击托盘图标时显示/隐藏窗口
-  tray.on("click", () => {
-    if (win) {
-      if (win.isVisible()) {
-        win.hide();
-      } else {
-        win.show();
-      }
-    }
+// 注册配置相关的IPC处理程序
+function registerConfigIpcHandlers() {
+  if (!configService) return;
+  
+  // 通用的获取配置
+  ipcMain.handle('config-get', (_event, key: string) => {
+    return configService?.get(key);
+  });
+  
+  // 通用的设置配置
+  ipcMain.handle('config-set', (_event, key: string, value: any) => {
+    configService?.set(key, value);
+    return true;
+  });
+  
+  // 获取所有配置
+  ipcMain.handle('config-get-all', () => {
+    return configService?.getAll();
+  });
+  
+  // 保留原有的特定方法以保持兼容性
+  // 获取主题
+  ipcMain.handle('config-get-theme', () => {
+    return configService?.getTheme();
+  });
+  
+  // 设置主题
+  ipcMain.handle('config-set-theme', (_event, theme: 'light' | 'dark') => {
+    configService?.setTheme(theme);
+    return true;
   });
 }
 
 /**
- * 注册全局快捷键
- * @param shortcut 要注册的快捷键
- * @returns 包含注册结果和错误信息的对象
+ * 注册应用程序相关的IPC处理程序
  */
-function registerGlobalShortcuts(shortcut: string) {
-  // 检查快捷键格式是否有效
-  if (!shortcut || shortcut.trim() === "") {
-    return { success: false, error: "快捷键格式无效" };
-  }
-
-  try {
-    // 检查快捷键是否已被注册（被其他应用占用）
-    if (globalShortcut.isRegistered(shortcut)) {
-      return { success: false, error: "快捷键已被其他应用占用" };
+function registerAppIpcHandlers() {
+  // 获取应用版本
+  ipcMain.handle('app-get-version', () => {
+    return app.getVersion();
+  });
+  
+  // 打开外部链接
+  ipcMain.handle('open-external-url', async (_event, url: string) => {
+    try {
+      // 导入shell模块用于打开外部链接
+      const { shell } = await import('electron');
+      await shell.openExternal(url);
+      return true;
+    } catch (error) {
+      console.error('Failed to open external URL:', error);
+      return false;
     }
-    const shortcutRegistered = globalShortcut.register(shortcut, () => {
-      if (win) {
-        if(!win.isFocused() || !win.isVisible()) {
-          win.show();
-          win.focus(); // 确保窗口获得焦点
-        }
-        else {
-          win.hide();
-        }
-      } else {
-        createWindow();
-      }
-    });
-
-    if (!shortcutRegistered) {
-      console.error("快捷键注册失败");
-      return { success: false, error: "快捷键注册失败" };
-    }
-
-    return { success: true, error: null };
-  } catch (error) {
-    console.error("注册快捷键时发生错误:", error);
-    return { success: false, error: "注册快捷键时发生错误" };
-  }
+  });
 }
 
 // 应用就绪后初始化数据库并创建主窗口（Electron应用启动的入口点）
@@ -298,61 +203,17 @@ app.whenReady().then(() => {
     console.error("Failed to initialize database:", error);
   }
 
-  // 创建主窗口
-  createWindow();
-
-  // 注册全局快捷键
-  // 注册 Ctrl+Alt+C 快捷键来显示/隐藏应用窗口
-  registerGlobalShortcuts("CommandOrControl+Alt+C");
-
-  // 修改启动快捷键
-  ipcMain.on("update-shortcut", (_event, { oldShortcut, newShortcut }) => {
-    // 先注销旧快捷键
-    if (oldShortcut) {
-      globalShortcut.unregister(oldShortcut);
-    }
-
-    // 注册新快捷键
-    if (newShortcut) {
-      const result = registerGlobalShortcuts(newShortcut);
-
-      // 如果注册失败，发送错误消息回渲染进程
-      if (!result.success) {
-        console.log("快捷键注册失败，发送错误消息:", result.error);
-        win?.webContents.send("shortcut-update-result", {
-          success: false,
-          error: result.error,
-          shortcut: oldShortcut,
-        });
-        // 尝试重新注册旧快捷键
-        if (oldShortcut) {
-          registerGlobalShortcuts(oldShortcut);
-        }
-      } else {
-        // 注册成功，发送成功消息
-        console.log("快捷键注册成功，发送成功消息");
-        win?.webContents.send("shortcut-update-result", {
-          success: true,
-          shortcut: newShortcut,
-        });
-      }
-    }
-  });
+  // 初始化所有服务
+  initializeServices();
+  
+  // 注册配置相关的IPC处理程序
+  registerConfigIpcHandlers();
+  
+  // 注册应用程序相关的IPC处理程序
+  registerAppIpcHandlers();
 });
 
-// 应用退出前关闭数据库连接
+// 应用退出前清理资源
 app.on("will-quit", () => {
-  closeDatabase();
-
-  // 销毁托盘
-  if (tray) {
-    tray.destroy();
-    tray = null;
-  }
-
-  // 停止监听剪贴板
-  clipboardEvent.stopListening();
-  
-  // 注销所有快捷键
-  globalShortcut.unregisterAll();
+  disposeServices();
 });

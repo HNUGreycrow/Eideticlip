@@ -39,18 +39,17 @@ const getClipboardData = computed(() => {
   });
 });
 
-let isOpen = false;
-
+const isOpen = ref(false);
 // 选择项目
 const selectItem = (item: ClipboardItem) => {
   selectedItem.value = item;
-  isOpen = true;
+  isOpen.value = true;
 };
 
 // 关闭详情面板
 const closeDetail = () => {
   selectedItem.value = null;
-  isOpen = false;
+  isOpen.value = false;
 };
 
 // 复制项目
@@ -152,6 +151,12 @@ const formatSize = (byte: number) => {
   const sizes = ['B', 'KB', 'MB'];
   const i = Math.floor(Math.log(byte) / Math.log(k));
   return `${(byte / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+}
+
+// 截断过长的文本
+const truncateText = (text: string, maxLength: number) => {
+  if (!text || typeof text !== 'string') return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
 // 添加新的剪贴板项目
@@ -395,12 +400,12 @@ const getTypeLabel = (type: string) => {
             @click="activeFilter = 'code'"
             >代码</span
           >
-          <span
+          <!-- <span
             class="filter-tag"
             :class="{ active: activeFilter === 'image' }"
             @click="activeFilter = 'image'"
             >图片</span
-          >
+          > -->
         </div>
       </div>
 
@@ -431,7 +436,7 @@ const getTypeLabel = (type: string) => {
               </el-icon>
             </div>
             <div class="item-content">
-              <div class="item-title">{{ item.content }}</div>
+              <div class="item-title">{{ truncateText(item.content, 100) }}</div>
               <div class="item-meta">
                 <span>{{ formatTime(item.timestamp) }}</span>
                 <span>•</span>

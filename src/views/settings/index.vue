@@ -15,6 +15,7 @@ const shortcut = ref("CommandOrControl+Alt+C");
 const tempKeys = ref<string[]>([]);
 const isRecording = ref(false);
 const shortcutInput = ref();
+const minimizeToTray = ref<boolean>(false);
 
 // 点击输入框时清空内容并开始记录
 const startRecording = () => {
@@ -103,9 +104,20 @@ const displayKeys = computed(() => {
     : shortcut.value;
 });
 
-onMounted(() => {
+onMounted(async () => {
   // 初始化主题值
+  await themeService.initTheme();
   theme.value = themeService.currentTheme.value;
+
+  minimizeToTray.value = await window.config.get<boolean>("minimizeToTray");
+
+  // 获取当前快捷键
+  window.ipcRenderer.once("shortcut-current", (_event, currentShortcut) => {
+    if (currentShortcut) {
+      shortcut.value = currentShortcut;
+    }
+  });
+  window.ipcRenderer.send("get-current-shortcut");
 });
 
 // 组件卸载时的清理工作
@@ -116,6 +128,10 @@ onUnmounted(() => {
 // 切换主题
 const handleThemeChange = (value: ThemeType) => {
   themeService.setTheme(value);
+};
+
+const handleMinimizeToTrayChange = (value: boolean) => {
+  window.config.set("minimizeToTray", value);
 };
 </script>
 
@@ -133,14 +149,25 @@ const handleThemeChange = (value: ThemeType) => {
         </template>
         <div class="setting-item">
           <div class="setting-label">
-            <span>深色主题</span>
-            <div class="setting-description">使用深色界面主题</div>
+            <span>主题设置</span>
+            <div class="setting-description">选择应用界面主题</div>
+          </div>
+          <el-radio-group v-model="theme" @change="handleThemeChange">
+            <el-radio-button label="light">浅色</el-radio-button>
+            <el-radio-button label="dark">深色</el-radio-button>
+            <el-radio-button label="pink">粉色</el-radio-button>
+          </el-radio-group>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">
+            <span>最小化到托盘</span>
+            <div class="setting-description">
+              应用最小化时是否隐藏到系统托盘
+            </div>
           </div>
           <el-switch
-            v-model="theme"
-            active-value="dark"
-            inactive-value="light"
-            @change="handleThemeChange"
+            v-model="minimizeToTray"
+            @change="handleMinimizeToTrayChange"
           ></el-switch>
         </div>
         <div class="setting-item">

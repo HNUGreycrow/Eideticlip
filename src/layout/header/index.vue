@@ -13,14 +13,22 @@ const handleMaximize = () => {
 }
 
 const handleClose = () => {
-  window.windowControls.close();
+  ElMessageBox.confirm('确认关闭应用吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'info'
+  }).then(() => {
+    window.windowControls.close();
+  }).catch(() => {
+    // 取消关闭
+  });
 }
 </script>
 
 <template>
   <div class="titlebar">
     <div class="titlebar-left">
-      <img src="@/assets/electron.svg" style="width: 20px; height: 20px;"></img>
+      <img src="/20250815110628.png" style="width: 20px; height: 20px; border-radius: 50%;"></img>
       <el-text class="mx-1" style="color: var(--text-primary);">Eideticlip</el-text>
     </div>
     </img>

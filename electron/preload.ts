@@ -58,3 +58,16 @@ contextBridge.exposeInMainWorld('clipboard', {
   clearAll: () => ipcRenderer.invoke('clipboard-clear-all'),
   getHistory: () => ipcRenderer.invoke('clipboard-get-history')
 })
+
+// 配置 API
+contextBridge.exposeInMainWorld('config', {
+  // 通用配置方法
+  get: (key: string) => ipcRenderer.invoke('config-get', key),
+  set: (key: string, value: any) => ipcRenderer.invoke('config-set', key, value),
+  getAll: () => ipcRenderer.invoke('config-get-all'),
+  
+  // 保留原有的特定方法以保持兼容性
+  getTheme: () => ipcRenderer.invoke('config-get-theme'),
+  setTheme: (theme: 'light' | 'dark') => ipcRenderer.invoke('config-set-theme', theme),
+  // 快捷键相关已通过现有的update-shortcut和shortcut-update-result处理
+})
