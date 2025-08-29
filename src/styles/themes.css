@@ -26,7 +26,7 @@
   --bg-active:    #333333;  /* 激活/按下高亮 */
 
   /* 文本颜色（按重要程度） */
-  --text-primary:   #ffffff;  /* 主文本 */
+  --text-primary:rgba(255, 255, 255, 0.9);  /* 主文本 */
   --text-secondary: #b3b3b3;  /* 副文本 */
   --text-tertiary:  #777777;  /* 提示文本 */
   --text-inverse:   #303133;  /* 用于深色背景上的“反色”文字 */
@@ -78,11 +78,55 @@
   --text-primary:   #303133;
   --text-secondary: #606266;
   --text-tertiary:  #909399;
-  --text-inverse:   #ffffff;  /* 用于浅色背景上的“反色”文字 */
+  --text-inverse:   #ffffff;  /* 用于浅色背景上的"反色"文字 */
 
   /* 边框颜色 */
   --border-light:  #dcdfe6;
   --border-medium: #e4e7ed;
 
   /* 强调色保持不变，无需重复定义 */
+}
+
+/* ===== 粉色主题 ===== */
+:root.pink {
+  /* Element Plus 官方变量 */
+  --el-color-primary-rgb: 255, 105, 180;
+  --el-color-primary: #ff69b4;
+  --el-bg-color: #fff0f5;
+  --el-bg-color-overlay: #fff5f8;
+  --el-bg-color-page: #fff0f5;
+  --el-text-color-primary: #4a2b3a;
+  --el-text-color-regular: #6d4e5c;
+  --el-text-color-secondary: #8e6b7a;
+  --el-border-color: #ffd1e1;
+  --el-border-color-light: #ffe4ee;
+  --el-border-color-lighter: #fff0f7;
+  --el-fill-color: #fff5f9;
+  --el-fill-color-light: #fffafc;
+  --el-fill-color-blank: #ffffff;
+  --el-mask-color: rgba(0, 0, 0, 0.5);
+  --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
+
+  /* 自定义语义化背景变量 */
+  --bg-primary:   #fde8f0;  /* 页面背景 */
+  --bg-secondary: #feeef3;  /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary:  #fef2f6;  /* 列表项、输入框背景 */
+  --bg-hover:     #ffe4ee;  /* hover 高亮（带主题色）*/
+  --bg-active:    #ffd1e1;
+
+  /* 文本颜色 */
+  --text-primary:   #4a2b3a;
+  --text-secondary: #6d4e5c;
+  --text-tertiary:  #8e6b7a;
+  --text-inverse:   #ffffff;
+
+  /* 边框颜色 */
+  --border-light:  #ffd1e1;
+  --border-medium: #ffb6c9;
+
+  /* 强调色 */
+  --accent-blue:   #ff69b4;
+  --accent-green:  #ff85a2;
+  --accent-red:    #ff4757;
+  --accent-purple: #da70d6;
 }

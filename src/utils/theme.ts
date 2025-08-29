@@ -1,21 +1,29 @@
 import { ref } from 'vue';
 
 // 主题类型
-export type ThemeType = 'light' | 'dark';
+export type ThemeType = 'light' | 'dark' | 'pink';
 
 // 创建一个响应式的主题状态
 const currentTheme = ref<ThemeType>('dark');
 
-// 获取本地存储的主题设置
-const initTheme = (): void => {
-  const savedTheme = localStorage.getItem('theme') as ThemeType;
-  if (savedTheme) {
-    currentTheme.value = savedTheme;
-  } else {
-    // 默认使用深色主题
+// 获取存储的主题设置
+const initTheme = async (): Promise<void> => {
+  try {
+    // 使用通用配置方法获取主题
+    const savedTheme = await window.config.get<ThemeType>('theme');
+    if (savedTheme) {
+      currentTheme.value = savedTheme;
+    } else {
+      // 默认使用深色主题
+      currentTheme.value = 'dark';
+    }
+    applyTheme(currentTheme.value);
+  } catch (error) {
+    console.error('获取主题设置失败:', error);
+    // 出错时使用默认主题
     currentTheme.value = 'dark';
+    applyTheme('dark');
   }
-  applyTheme(currentTheme.value);
 };
 
 // 切换主题
@@ -27,7 +35,10 @@ const toggleTheme = (): void => {
 // 设置主题
 const setTheme = (theme: ThemeType): void => {
   currentTheme.value = theme;
-  localStorage.setItem('theme', theme);
+  // 使用通用配置方法保存主题
+  window.config.set('theme', theme).catch((error: any) => {
+    console.error('保存主题设置失败:', error);
+  });
   applyTheme(theme);
 };
 
@@ -36,13 +47,8 @@ const applyTheme = (theme: ThemeType): void => {
   document.documentElement.setAttribute('data-theme', theme);
   
   // 为body添加对应的主题类
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark');
-    document.documentElement.classList.remove('light');
-  } else {
-    document.documentElement.classList.add('light');
-    document.documentElement.classList.remove('dark');
-  }
+  document.documentElement.classList.remove('dark', 'light', 'pink');
+  document.documentElement.classList.add(theme);
 };
 
 // 导出主题服务
