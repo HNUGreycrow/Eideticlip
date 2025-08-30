@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { themeService } from './utils/theme';
+import UpdateDialog from './components/UpdateDialog.vue';
 
 onMounted(() => {
   // 初始化主题
@@ -10,6 +11,7 @@ onMounted(() => {
 
 <template>
   <RouterView></RouterView>
+  <UpdateDialog />
 </template>
 
 <style>

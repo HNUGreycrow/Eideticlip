@@ -11,6 +11,13 @@
     "dist",
     "dist-electron"
   ],
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "HNUGreycrow",
+      "repo": "Eideticlip"
+    }
+  ],
   "mac": {
     "target": [
       "dmg"

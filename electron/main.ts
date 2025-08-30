@@ -10,6 +10,7 @@ import {
   ClipboardService,
   ShortcutService,
   ConfigService,
+  UpdateService,
 } from "./services";
 
 
@@ -46,6 +47,7 @@ let trayService: TrayService | null = null;
 let clipboardService: ClipboardService | null = null;
 let shortcutService: ShortcutService | null = null;
 let configService: ConfigService | null = null;
+let updateService: UpdateService | null = null;
 
 /**
  * 清理应用资源
@@ -69,6 +71,11 @@ function disposeServices() {
   if (trayService) {
     trayService.dispose();
     trayService = null;
+  }
+  
+  if (updateService) {
+    updateService.dispose();
+    updateService = null;
   }
 
   if (windowService) {
@@ -135,6 +142,9 @@ function initializeServices() {
   if (savedShortcut) {
     shortcutService.registerGlobalShortcut(savedShortcut);
   }
+  
+  // 创建更新服务
+  updateService = new UpdateService(mainWindow, configService);
 }
 
 // 注册配置相关的IPC处理程序

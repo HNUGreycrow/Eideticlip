@@ -34,6 +34,17 @@ interface WindowControls {
   close: () => void
   onStatusChange: (callback: (status: { maximized: boolean }) => void) => void
 }
+
+// 更新服务类型定义
+interface UpdateControls {
+  checkForUpdates: () => Promise<any>
+  downloadUpdate: () => Promise<boolean | { error: any }>
+  installUpdate: () => Promise<boolean>
+  setAutoUpdate: (enabled: boolean) => Promise<boolean>
+  getAutoUpdate: () => Promise<boolean>
+  onUpdateStatus: (callback: (status: { status: string, data?: any }) => void) => () => void
+}
+
 contextBridge.exposeInMainWorld('windowControls', {
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
@@ -71,3 +82,19 @@ contextBridge.exposeInMainWorld('config', {
   setTheme: (theme: 'light' | 'dark') => ipcRenderer.invoke('config-set-theme', theme),
   // 快捷键相关已通过现有的update-shortcut和shortcut-update-result处理
 })
+
+// 暴露更新相关API
+contextBridge.exposeInMainWorld('updater', {
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+  setAutoUpdate: (enabled: boolean) => ipcRenderer.invoke('set-auto-update', enabled),
+  getAutoUpdate: () => ipcRenderer.invoke('get-auto-update'),
+  onUpdateStatus: (callback: (status: { status: string, data?: any }) => void) => {
+    // 创建一个包装函数来处理事件参数
+    const wrappedCallback = (_event: any, status: any) => callback(status);
+    ipcRenderer.on('update-status', wrappedCallback);
+    // 返回一个清理函数，使用相同的包装函数移除监听器
+    return () => ipcRenderer.removeListener('update-status', wrappedCallback);
+  }
+} as UpdateControls)

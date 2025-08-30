@@ -51,4 +51,12 @@ interface Window {
     getTheme: () => Promise<'light' | 'dark'>
     setTheme: (theme: 'light' | 'dark') => Promise<boolean>
   }
+  updater: {
+    checkForUpdates: () => Promise<any>
+    downloadUpdate: () => Promise<boolean | { error: any }>
+    installUpdate: () => Promise<boolean>
+    setAutoUpdate: (enabled: boolean) => Promise<boolean>
+    getAutoUpdate: () => Promise<boolean>
+    onUpdateStatus: (callback: (status: { status: string, data?: any }) => void) => () => void
+  }
 }

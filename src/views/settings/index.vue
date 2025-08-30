@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { themeService } from "../../utils/theme";
 import type { ThemeType } from "../../utils/theme";
 import { checkShortcut } from "@/utils/validate";
@@ -16,6 +16,7 @@ const tempKeys = ref<string[]>([]);
 const isRecording = ref(false);
 const shortcutInput = ref();
 const minimizeToTray = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
 
 // 点击输入框时清空内容并开始记录
 const startRecording = () => {
@@ -120,11 +121,6 @@ onMounted(async () => {
   window.ipcRenderer.send("get-current-shortcut");
 });
 
-// 组件卸载时的清理工作
-onUnmounted(() => {
-  // 不再需要移除事件监听器，因为我们使用的是once方法
-});
-
 // 切换主题
 const handleThemeChange = (value: ThemeType) => {
   themeService.setTheme(value);
@@ -132,6 +128,28 @@ const handleThemeChange = (value: ThemeType) => {
 
 const handleMinimizeToTrayChange = (value: boolean) => {
   window.config.set("minimizeToTray", value);
+};
+
+let removeListener: (() => void) | null = null;
+// 检查更新
+const checkForUpdates = async () => {
+  try {
+    isLoading.value = true;
+
+    // 添加事件监听器，用于接收更新状态
+    removeListener = window.updater.onUpdateStatus((status) => {
+      if (status.status === "update-not-available") {
+        ElMessage.info("当前已是最新版本");
+      }
+    });
+
+    await window.updater.checkForUpdates();
+  } catch (error) {
+    ElMessage.error("检查更新失败: " + error);
+  } finally {
+    removeListener?.(); // 移除监听器
+    isLoading.value = false;
+  }
 };
 </script>
 
@@ -196,6 +214,25 @@ const handleMinimizeToTrayChange = (value: boolean) => {
           ></el-input>
         </div>
       </el-card>
+
+      <el-card style="width: 100%; margin-top: 20px" class="setting-card">
+        <template #header>
+          <div class="card-header">
+            <span>版本更新</span>
+          </div>
+        </template>
+        <div class="setting-item">
+          <div class="setting-label">
+            <span>检查更新</span>
+            <div class="setting-description">检查并安装应用更新</div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center">
+            <el-button :loading="isLoading" @click="checkForUpdates">
+              检查更新
+            </el-button>
+          </div>
+        </div>
+      </el-card>
     </div>
   </div>
 </template>
@@ -218,6 +255,7 @@ const handleMinimizeToTrayChange = (value: boolean) => {
 .content {
   display: flex;
   justify-content: center;
+  flex-direction: column;
   padding: 24px;
 }
 
