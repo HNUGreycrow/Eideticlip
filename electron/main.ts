@@ -166,18 +166,6 @@ function registerConfigIpcHandlers() {
   ipcMain.handle('config-get-all', () => {
     return configService?.getAll();
   });
-  
-  // 保留原有的特定方法以保持兼容性
-  // 获取主题
-  ipcMain.handle('config-get-theme', () => {
-    return configService?.getTheme();
-  });
-  
-  // 设置主题
-  ipcMain.handle('config-set-theme', (_event, theme: 'light' | 'dark') => {
-    configService?.setTheme(theme);
-    return true;
-  });
 }
 
 /**

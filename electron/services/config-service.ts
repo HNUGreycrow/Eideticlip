@@ -2,7 +2,7 @@ import Store from 'electron-store';
 
 // 定义配置类型
 interface ConfigSchema {
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark' | 'pink' | 'orange';
   shortcut: string;
   minimizeToTray: boolean;
   // 可以在这里添加更多配置项
@@ -62,21 +62,6 @@ export class ConfigService {
     this.store.set(key, value);
   }
 
-  /**
-   * 获取主题配置
-   * @returns 当前主题
-   */
-  public getTheme(): 'light' | 'dark' {
-    return this.store.get('theme');
-  }
-
-  /**
-   * 设置主题配置
-   * @param theme 主题
-   */
-  public setTheme(theme: 'light' | 'dark'): void {
-    this.store.set('theme', theme);
-  }
 
   /**
    * 获取快捷键配置

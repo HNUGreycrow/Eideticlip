@@ -1,3 +1,4 @@
+import { WindowControls, UpdateControls } from '@/utils/type'
 import { ipcRenderer, contextBridge } from 'electron'
 
 // --------- Expose some API to the Renderer process ---------
@@ -27,24 +28,6 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // ...
 })
 
-// 类型定义（供 Vue 组件使用）
-interface WindowControls {
-  minimize: () => void
-  maximize: () => void
-  close: () => void
-  onStatusChange: (callback: (status: { maximized: boolean }) => void) => void
-}
-
-// 更新服务类型定义
-interface UpdateControls {
-  checkForUpdates: () => Promise<any>
-  downloadUpdate: () => Promise<boolean | { error: any }>
-  installUpdate: () => Promise<boolean>
-  setAutoUpdate: (enabled: boolean) => Promise<boolean>
-  getAutoUpdate: () => Promise<boolean>
-  onUpdateStatus: (callback: (status: { status: string, data?: any }) => void) => () => void
-}
-
 contextBridge.exposeInMainWorld('windowControls', {
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
@@ -67,7 +50,10 @@ contextBridge.exposeInMainWorld('clipboard', {
   saveItem: (item: any) => ipcRenderer.invoke('clipboard-save-item', item),
   deleteItem: (id: number) => ipcRenderer.invoke('clipboard-delete-item', id),
   clearAll: () => ipcRenderer.invoke('clipboard-clear-all'),
-  getHistory: () => ipcRenderer.invoke('clipboard-get-history')
+  getHistory: () => ipcRenderer.invoke('clipboard-get-history'),
+  // 收藏相关API
+  setFavorite: (id: number, isFavorite: boolean) => ipcRenderer.invoke('clipboard-set-favorite', id, isFavorite),
+  getFavorites: () => ipcRenderer.invoke('clipboard-get-favorites')
 })
 
 // 配置 API
@@ -76,11 +62,7 @@ contextBridge.exposeInMainWorld('config', {
   get: (key: string) => ipcRenderer.invoke('config-get', key),
   set: (key: string, value: any) => ipcRenderer.invoke('config-set', key, value),
   getAll: () => ipcRenderer.invoke('config-get-all'),
-  
-  // 保留原有的特定方法以保持兼容性
-  getTheme: () => ipcRenderer.invoke('config-get-theme'),
-  setTheme: (theme: 'light' | 'dark') => ipcRenderer.invoke('config-set-theme', theme),
-  // 快捷键相关已通过现有的update-shortcut和shortcut-update-result处理
+   // 快捷键相关已通过现有的update-shortcut和shortcut-update-result处理
 })
 
 // 暴露更新相关API
