@@ -5,7 +5,7 @@ import { ClipboardItem } from "@/utils/type";
 
 // 定义组件名称，用于keep-alive识别
 defineOptions({
-  name: 'clipboard'
+  name: "clipboard",
 });
 
 const activeFilter = ref("all");
@@ -24,8 +24,17 @@ const getClipboardData = computed(() => {
 
   return clipboardData.value.filter((item) => {
     // 类型过滤
-    const typeMatch =
-      activeFilter.value === "all" || item.type === activeFilter.value;
+    let typeMatch = activeFilter.value === "all";
+
+    // 普通类型过滤
+    if (!typeMatch && activeFilter.value !== "favorite") {
+      typeMatch = item.type === activeFilter.value;
+    }
+
+    // 收藏过滤
+    if (!typeMatch && activeFilter.value === "favorite") {
+      typeMatch = !!item.is_favorite;
+    }
 
     // 内容搜索过滤 - 如果搜索为空则跳过此检查
     const contentMatch =
@@ -50,6 +59,38 @@ const selectItem = (item: ClipboardItem) => {
 const closeDetail = () => {
   selectedItem.value = null;
   isOpen.value = false;
+};
+
+// 切换收藏状态
+const toggleFavorite = (item: ClipboardItem, event?: Event) => {
+  if (event) event.stopPropagation();
+  const newStatus = !item.is_favorite;
+
+  window.clipboard
+    .setFavorite(item.id, newStatus)
+    .then((success) => {
+      if (success) {
+        // 更新本地状态
+        item.is_favorite = newStatus;
+        ElMessage({
+          message: newStatus ? "已添加到收藏" : "已取消收藏",
+          type: newStatus ? "success" : "info",
+        });
+      } else {
+        console.error("设置收藏状态失败");
+        ElMessage({
+          message: "操作失败",
+          type: "error",
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("设置收藏状态出错:", error);
+      ElMessage({
+        message: "操作失败",
+        type: "error",
+      });
+    });
 };
 
 // 复制项目
@@ -111,36 +152,35 @@ const clearAll = () => {
     confirmButtonText: "确认",
     cancelButtonText: "取消",
     type: "warning",
-  })
-    .then(() => {
-      // 从数据库中清空所有记录
-      window.clipboard
-        .clearAll()
-        .then((success) => {
-          if (success) {
-            // 清空本地数据
-            clipboardData.value = [];
-            selectedItem.value = null;
-            ElMessage({
-              message: "已清空所有记录",
-              type: "success",
-            });
-          } else {
-            console.error("清空剪贴板历史失败");
-            ElMessage({
-              message: "清空失败",
-              type: "error",
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("清空剪贴板历史出错:", error);
+  }).then(() => {
+    // 从数据库中清空所有记录
+    window.clipboard
+      .clearAll()
+      .then((success) => {
+        if (success) {
+          // 清空本地数据
+          clipboardData.value = [];
+          selectedItem.value = null;
+          ElMessage({
+            message: "已清空所有记录",
+            type: "success",
+          });
+        } else {
+          console.error("清空剪贴板历史失败");
           ElMessage({
             message: "清空失败",
             type: "error",
           });
+        }
+      })
+      .catch((error) => {
+        console.error("清空剪贴板历史出错:", error);
+        ElMessage({
+          message: "清空失败",
+          type: "error",
         });
-    })
+      });
+  });
 };
 
 const formatSize = (byte: number) => {
@@ -148,16 +188,16 @@ const formatSize = (byte: number) => {
     return `${byte} B`;
   }
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB'];
+  const sizes = ["B", "KB", "MB"];
   const i = Math.floor(Math.log(byte) / Math.log(k));
   return `${(byte / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
-}
+};
 
 // 截断过长的文本
 const truncateText = (text: string, maxLength: number) => {
-  if (!text || typeof text !== 'string') return '';
-  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-}
+  if (!text || typeof text !== "string") return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
 
 // 添加新的剪贴板项目
 const addClipboardItem = (content: string) => {
@@ -286,7 +326,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  console.log("组件卸载")
+  console.log("组件卸载");
   stopClipboardWatcher();
 });
 
@@ -305,13 +345,13 @@ const exportData = () => {
 
 // 格式化时间
 const formatTime = (timestamp: Date) => {
-  return timestamp.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  return timestamp.toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
     hour12: false,
   });
 };
@@ -326,7 +366,6 @@ const getTypeLabel = (type: string) => {
   };
   return labels[type] || "文件";
 };
-
 </script>
 
 <template>
@@ -400,6 +439,12 @@ const getTypeLabel = (type: string) => {
             @click="activeFilter = 'code'"
             >代码</span
           >
+          <span
+            class="filter-tag"
+            :class="{ active: activeFilter === 'favorite' }"
+            @click="activeFilter = 'favorite'"
+            >收藏</span
+          >
           <!-- <span
             class="filter-tag"
             :class="{ active: activeFilter === 'image' }"
@@ -423,8 +468,14 @@ const getTypeLabel = (type: string) => {
             v-for="item in getClipboardData"
             :key="item.id"
             class="content-item"
-            :class="{ active: selectedItem?.id === item.id }"
-            @click="copyItem(item, $event); selectedItem = item"
+            :class="{
+              active: selectedItem?.id === item.id,
+              favorite: item.is_favorite,
+            }"
+            @click="
+              copyItem(item, $event);
+              selectedItem = item;
+            "
           >
             <div class="item-icon">
               <el-icon>
@@ -436,7 +487,9 @@ const getTypeLabel = (type: string) => {
               </el-icon>
             </div>
             <div class="item-content">
-              <div class="item-title">{{ truncateText(item.content, 100) }}</div>
+              <div class="item-title">
+                {{ truncateText(item.content, 100) }}
+              </div>
               <div class="item-meta">
                 <span>{{ formatTime(item.timestamp) }}</span>
                 <span>•</span>
@@ -452,6 +505,13 @@ const getTypeLabel = (type: string) => {
                 title="查看"
               >
                 <i-ep-view />
+              </el-button>
+              <el-button
+                class="item-action-btn"
+                @click.stop="toggleFavorite(item, $event)"
+                :title="item.is_favorite ? '取消收藏' : '收藏'"
+              >
+                <i-ep-Star class="icon-color" />
               </el-button>
               <el-button
                 class="item-action-btn"
@@ -473,6 +533,7 @@ const getTypeLabel = (type: string) => {
       @close="closeDetail"
       @copy="copyItem"
       @delete="deleteItem"
+      @favorite="toggleFavorite"
     />
   </div>
 </template>
@@ -649,6 +710,50 @@ const getTypeLabel = (type: string) => {
   display: flex;
   align-items: flex-start;
   gap: 16px;
+
+  /* 收藏项目特殊样式 */
+  &.favorite {
+    background: var(--favorite-bg);
+    border-left: 3px solid var(--favorite-border);
+    position: relative;
+
+    &:hover {
+      border-left: 3px solid var(--favorite-border);
+    }
+
+    &.active {
+      border-color: var(--favorite-border);
+    }
+
+    .icon-color {
+      color: var(--favorite-border);
+      fill: var(--favorite-border);
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 20px 20px 0;
+      border-color: transparent var(--favorite-corner) transparent transparent;
+      z-index: 1;
+      border-top-right-radius: 8px;
+    }
+
+    &::after {
+      content: "★";
+      position: absolute;
+      top: 0px;
+      right: 2px;
+      font-size: 10px;
+      color: white;
+      z-index: 2;
+    }
+  }
 }
 
 .content-item:hover {

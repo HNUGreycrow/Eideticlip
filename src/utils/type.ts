@@ -12,6 +12,7 @@ export interface ClipboardItem {
   content: string;
   timestamp: Date;
   size: string;
+  is_favorite?: boolean;
 }
 
 export interface clipboardAPI {
@@ -26,6 +27,9 @@ export interface clipboardAPI {
   deleteItem: (id: number) => Promise<boolean>;
   clearAll: () => Promise<boolean>;
   getHistory: () => Promise<ClipboardItem[]>;
+  // 收藏相关API
+  setFavorite: (id: number, isFavorite: boolean) => Promise<boolean>;
+  getFavorites: () => Promise<ClipboardItem[]>;
 }
 
 export interface IpcRendererAPI {
@@ -34,4 +38,14 @@ export interface IpcRendererAPI {
   send: (channel: string, ...args: any[]) => void;
   invoke: (channel: string, ...args: any[]) => Promise<any>;
   once: (channel: string, listener: (...args: any[]) => void) => void;
+}
+
+// 更新服务类型定义
+export interface UpdateControls {
+  checkForUpdates: () => Promise<any>
+  downloadUpdate: () => Promise<boolean | { error: any }>
+  installUpdate: () => Promise<boolean>
+  setAutoUpdate: (enabled: boolean) => Promise<boolean>
+  getAutoUpdate: () => Promise<boolean>
+  onUpdateStatus: (callback: (status: { status: string, data?: any }) => void) => () => void
 }

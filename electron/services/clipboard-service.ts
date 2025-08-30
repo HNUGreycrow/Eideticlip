@@ -5,6 +5,8 @@ import {
   deleteClipboardItem,
   clearClipboardHistory,
   getClipboardHistory,
+  setFavoriteStatus,
+  getFavoriteClipboardItems,
 } from "../database/clipboard";
 
 // 在ES模块中模拟CommonJS的require功能
@@ -76,6 +78,16 @@ export class ClipboardService {
     // 获取剪贴板历史
     ipcMain.handle("clipboard-get-history", () => {
       return getClipboardHistory();
+    });
+
+    // 设置剪贴板项目的收藏状态
+    ipcMain.handle("clipboard-set-favorite", (_, id, isFavorite) => {
+      return setFavoriteStatus(id, isFavorite);
+    });
+
+    // 获取收藏的剪贴板项目
+    ipcMain.handle("clipboard-get-favorites", () => {
+      return getFavoriteClipboardItems();
     });
   }
 

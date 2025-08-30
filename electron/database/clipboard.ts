@@ -56,7 +56,8 @@ export function initDatabase(isDevelopment = false) {
         content TEXT NOT NULL,
         type TEXT NOT NULL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        size VARCHAR(10)
+        size VARCHAR(10),
+        is_favorite BOOLEAN DEFAULT 0
       );
     `;
     db.prepare(createCliboardItemQuery).run();
@@ -93,12 +94,13 @@ export function saveClipboardItem(item: any) {
   try {
     // 将Date对象转换为ISO字符串
     const timestamp = item.timestamp instanceof Date ? item.timestamp.toISOString() : item.timestamp;
+    const isFavorite = item.is_favorite ? 1 : 0;
     
     const insertQuery = `
-      INSERT INTO clipboard_items (content, type, timestamp, size)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO clipboard_items (content, type, timestamp, size, is_favorite)
+      VALUES (?, ?, ?, ?, ?)
     `
-    db.prepare(insertQuery).run(item.content, item.type, timestamp, item.size);
+    db.prepare(insertQuery).run(item.content, item.type, timestamp, item.size, isFavorite);
     return true;
   } catch (error) {
     console.error("Failed to save clipboard item:", error);
@@ -154,6 +156,42 @@ export function getClipboardHistory() {
     return rows;
   } catch (error) {
     console.error("Failed to get clipboard history:", error);
+    return [];
+  }
+}
+
+/**
+ * 设置剪贴板项目的收藏状态
+ * @param id 项目ID
+ * @param isFavorite 是否收藏
+ * @returns 是否设置成功
+ */
+export function setFavoriteStatus(id: string, isFavorite: boolean) {
+  try {
+    const updateQuery = `
+      UPDATE clipboard_items SET is_favorite = ? WHERE id = ?
+    `
+    db.prepare(updateQuery).run(isFavorite ? 1 : 0, id);
+    return true;
+  } catch (error) {
+    console.error("Failed to update favorite status:", error);
+    return false;
+  }
+}
+
+/**
+ * 获取收藏的剪贴板项目
+ * @returns 收藏的剪贴板项目列表
+ */
+export function getFavoriteClipboardItems() {
+  try {
+    const selectQuery = `
+      SELECT * FROM clipboard_items WHERE is_favorite = 1 ORDER BY id DESC
+    `
+    const rows = db.prepare(selectQuery).all();
+    return rows;
+  } catch (error) {
+    console.error("Failed to get favorite clipboard items:", error);
     return [];
   }
 }

@@ -40,6 +40,14 @@
           <i-ep-Document-Copy class="btn-icon" />
           <span>复制内容</span>
         </el-button>
+        <el-button 
+          class="detail-action-btn" 
+          :type="item.is_favorite ? 'warning' : 'default'"
+          @click="toggleFavorite(item)"
+        >
+          <i-ep-Star class="btn-icon" :filled="item.is_favorite" />
+          <span>{{ item.is_favorite ? '取消收藏' : '收藏' }}</span>
+        </el-button>
         <el-button class="detail-action-btn" @click="deleteItem(item)">
           <i-ep-Delete class="btn-icon" />
           <span>删除</span>
@@ -69,6 +77,7 @@ const emit = defineEmits<{
   close: [];
   copy: [item: Item];
   delete: [item: Item];
+  favorite: [item: Item];
 }>();
 
 const closeDetail = () => {
@@ -81,6 +90,10 @@ const copyItem = (item: Item) => {
 
 const deleteItem = (item: Item) => {
   emit("delete", item);
+};
+
+const toggleFavorite = (item: Item) => {
+  emit("favorite", item);
 };
 
 const getTypeLabel = (type: string) => {
@@ -246,7 +259,7 @@ const formatTime = (timestamp: Date) => {
   justify-content: center;
   gap: 8px;
   margin-left: 0px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .btn-icon {
