@@ -1,18 +1,75 @@
-# Vue 3 + TypeScript + Vite
+# EidetiClip - 剪贴板管理工具
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 📝 项目简介
 
-## Recommended IDE Setup
+EidetiClip 是一款基于 Electron 和 Vue 3 开发的剪贴板管理工具，它能够自动记录您复制的内容，让您随时查看和重用剪贴板历史记录。
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## ✨ 主要特性
 
-## Type Support For `.vue` Imports in TS
+- **剪贴板历史记录**：自动保存您复制的文本内容，随时查看和重用
+- **全局快捷键**：通过自定义快捷键快速访问剪贴板历史
+- **系统托盘**：最小化到系统托盘，不干扰您的工作流程
+- **主题切换**：支持亮色和暗色主题，保护您的眼睛
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+## 🔧 技术栈
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+- **前端框架**：Vue 3 + TypeScript
+- **构建工具**：Vite
+- **UI 组件库**：Element Plus
+- **桌面应用框架**：Electron
+- **数据存储**：SQLite (better-sqlite3)
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+## 🚀 快速开始
+
+### 开发环境
+
+```bash
+# 安装依赖
+npm install
+
+# 重建 SQLite3 (如果需要)
+npm run sqlite3-rebuild
+
+# 启动开发服务器
+npm run dev
+```
+
+### 构建应用
+
+```bash
+# 构建生产版本
+npm run build
+```
+
+## 📦 项目结构
+
+```
+├── electron/              # Electron 主进程代码
+│   ├── database/          # 数据库相关代码
+│   ├── services/          # 主进程服务
+│   ├── main.ts            # 主进程入口
+│   └── preload.ts         # 预加载脚本
+├── src/                   # 渲染进程代码 (Vue 应用)
+│   ├── assets/            # 静态资源
+│   ├── components/        # Vue 组件
+│   ├── layout/            # 布局组件
+│   ├── router/            # 路由配置
+│   ├── styles/            # 样式文件
+│   ├── utils/             # 工具函数
+│   ├── views/             # 页面视图
+│   └── main.ts            # 渲染进程入口
+├── public/                # 公共资源
+└── vite.config.ts         # Vite 配置
+```
+
+## 🔄 功能流程
+
+1. 应用启动时初始化数据库和各项服务
+2. 剪贴板服务监听系统剪贴板变化
+3. 当检测到新的剪贴板内容时，保存到数据库并通知渲染进程
+4. 用户可以通过界面或快捷键查看和管理剪贴板历史
+5. 用户可以点击历史记录项将其恢复到系统剪贴板
+
+## 📄 许可证
+
+[MIT](./LICENSE)
