@@ -74,7 +74,11 @@ html, body, #app {
 
 .el-button--primary {
   --el-button-bg-color: var(--accent-blue);
+  --el-button-text-color: var(--text-inverse);
   --el-button-border-color: var(--accent-blue);
+  --el-button-hover-bg-color: var(--accent-blue-hover, var(--bg-active)); /* 使用主题变量 */
+  --el-button-hover-border-color: var(--accent-blue-hover, var(--bg-active));
+  --el-button-hover-text-color: var(--text-inverse);
 }
 
 .el-input__wrapper {

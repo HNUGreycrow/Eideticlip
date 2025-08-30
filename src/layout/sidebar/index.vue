@@ -31,14 +31,14 @@ const openAbout = () => {
       <i-ep-document-copy />
       <!-- <span class="nav-badge">24</span> -->
     </button>
-    <button 
+    <!-- <button 
       class="nav-item" 
       :class="{ active: activeModule === 'favorites' }" 
       title="收藏" 
       @click="switchModule('favorites')"
     >
       <i-ep-star />
-    </button>
+    </button> -->
     <div class="nav-divider"></div>
     <button 
       class="nav-item" 

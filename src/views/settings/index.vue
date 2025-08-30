@@ -174,6 +174,7 @@ const checkForUpdates = async () => {
             <el-radio-button label="light">浅色</el-radio-button>
             <el-radio-button label="dark">深色</el-radio-button>
             <el-radio-button label="pink">粉色</el-radio-button>
+            <el-radio-button label="orange">橙色</el-radio-button>
           </el-radio-group>
         </div>
         <div class="setting-item">
@@ -188,6 +189,14 @@ const checkForUpdates = async () => {
             @change="handleMinimizeToTrayChange"
           ></el-switch>
         </div>
+      </el-card>
+
+      <el-card style="width: 100%; margin-top: 20px" class="setting-card">
+        <template #header>
+          <div class="card-header">
+            <span>快捷键设置</span>
+          </div>
+        </template>
         <div class="setting-item">
           <div class="setting-label">
             <span>启动快捷键</span>
@@ -214,7 +223,7 @@ const checkForUpdates = async () => {
           ></el-input>
         </div>
       </el-card>
-
+      
       <el-card style="width: 100%; margin-top: 20px" class="setting-card">
         <template #header>
           <div class="card-header">
@@ -241,6 +250,8 @@ const checkForUpdates = async () => {
 .settings-container {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .content-header {
@@ -254,7 +265,6 @@ const checkForUpdates = async () => {
 
 .content {
   display: flex;
-  justify-content: center;
   flex-direction: column;
   padding: 24px;
 }
