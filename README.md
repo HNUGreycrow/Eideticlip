@@ -1,8 +1,8 @@
-# EidetiClip - 剪贴板管理工具
+# Eideticlip - 剪贴板管理工具
 
 ## 📝 项目简介
 
-EidetiClip 是一款基于 Electron 和 Vue 3 开发的剪贴板管理工具，它能够自动记录您复制的内容，让您随时查看和重用剪贴板历史记录。
+Eideticlip 是一款基于 Electron 和 Vue 3 开发的剪贴板管理工具，它能够自动记录您复制的内容，让您随时查看和重用剪贴板历史记录。
 
 ## ✨ 主要特性
 
@@ -21,7 +21,13 @@ EidetiClip 是一款基于 Electron 和 Vue 3 开发的剪贴板管理工具，�
 
 ## 🚀 快速开始
 
-### 开发环境
+### 方式一：直接下载
+
+从 [Releases](https://github.com/HNUGreycrow/Eideticlip/releases) 页面下载安装包。
+
+### 方式二：源码构建
+
+#### 开发环境
 
 ```bash
 # 安装依赖
@@ -34,7 +40,7 @@ npm run sqlite3-rebuild
 npm run dev
 ```
 
-### 构建应用
+#### 构建应用
 
 ```bash
 # 构建生产版本
