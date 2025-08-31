@@ -41,6 +41,7 @@ import Sidebar from "./sidebar/index.vue";
 .el-header {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-light);
+  z-index: 10;
 }
 
 .el-main {
@@ -49,7 +50,9 @@ import Sidebar from "./sidebar/index.vue";
 }
 
 .main-container {
-  height: calc(100vh - 32px);
+  height: calc(100% - 32px);
   overflow: hidden;
+  display: flex;
+  flex: 1;
 }
 </style>

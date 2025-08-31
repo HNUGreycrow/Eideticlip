@@ -63,41 +63,47 @@ const openAbout = () => {
 <style lang="scss" scoped>
 /* 左侧导航栏 - 纯图标模式 */
 .nav-sidebar {
-  width: var(--nav-width);
+  width: var(--nav-width, 60px);
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 0;
+  padding: 16px 0;
   height: 100%;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .nav-item {
-  width: 44px;
-  height: 44px;
-  margin: 4px 0;
+  width: 42px;
+  height: 42px;
+  margin: 5px 0;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
   color: var(--text-secondary);
   transition: all 0.2s ease;
   position: relative;
+  opacity: 0.85;
 }
 
 .nav-item:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 .nav-item.active {
   background: var(--bg-active);
   color: var(--accent-blue);
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 132, 255, 0.15);
 }
 
 .nav-item.active::before {

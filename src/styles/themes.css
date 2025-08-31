@@ -19,25 +19,25 @@
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
 
   /* 自定义语义化背景变量（层级由高到低） */
-  --bg-primary:   #181818;  /* 页面背景 / 最底层容器 */
-  --bg-secondary: #1e1e1e;  /* 卡片、侧边栏、弹窗背景 */
-  --bg-tertiary:  #252525;  /* 列表项、输入框背景 */
+  --bg-primary:   #141414;  /* 页面背景 / 最底层容器 */
+  --bg-secondary: #1a1a1a;  /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary:  #222222;  /* 列表项、输入框背景 */
   --bg-hover:     #2a2a2a;  /* hover 高亮 */
-  --bg-active:    #333333;  /* 激活/按下高亮 */
+  --bg-active:    #303030;  /* 激活/按下高亮 */
 
   /* 文本颜色（按重要程度） */
-  --text-primary:rgba(255, 255, 255, 0.9);  /* 主文本 */
-  --text-secondary: #b3b3b3;  /* 副文本 */
-  --text-tertiary:  #777777;  /* 提示文本 */
-  --text-inverse:   #303133;  /* 用于深色背景上的“反色”文字 */
+  --text-primary:rgba(255, 255, 255, 0.95);  /* 主文本 */
+  --text-secondary: #b8b8b8;  /* 副文本 */
+  --text-tertiary:  #808080;  /* 提示文本 */
+  --text-inverse:   #ffffff;  /* 用于深色背景上的"反色"文字 */
 
   /* 边框颜色 */
-  --border-light:  #333333;
-  --border-medium: #444444;
+  --border-light:  #2c2c2c;
+  --border-medium: #3c3c3c;
 
   /* 强调色（主题无关，两个主题保持一致） */
-  --accent-blue:   #0084ff;
-  --accent-blue-hover: #0070db; /* 按钮悬停状态 */
+  --accent-blue:   #0088ff;
+  --accent-blue-hover: #0078e7; /* 按钮悬停状态 */
   --accent-green:  #42b883;
   --accent-red:    #ff4757;
   --accent-purple: #8b5cf6;

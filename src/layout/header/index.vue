@@ -28,10 +28,9 @@ const handleClose = () => {
 <template>
   <div class="titlebar">
     <div class="titlebar-left">
-      <img src="/20250815110628.png" style="width: 20px; height: 20px; border-radius: 50%;"></img>
-      <el-text class="mx-1" style="color: var(--text-primary);">Eideticlip</el-text>
+      <img src="/20250815110628.png" class="app-logo"></img>
+      <el-text class="app-title">Eideticlip</el-text>
     </div>
-    </img>
     <div class="titlebar-controls">
       <!-- 最小化按钮 -->
       <el-button class="titlebar-btn minimize-btn" aria-label="最小化窗口" @click="handleMinimize">
@@ -65,14 +64,16 @@ const handleClose = () => {
   overflow: hidden;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-light);
+  height: 32px;
 }
 
 .titlebar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   position: relative;
-  padding-left: 16px;
+  padding-left: 12px;
+  height: 100%;
 }
 
 .titlebar-controls {
@@ -86,14 +87,14 @@ const handleClose = () => {
 
 // 基础按钮样式
 :deep(.titlebar-btn) {
-  width: 36px;
+  width: 32px;
   height: 32px;
   background-color: transparent;
   border: none;
-  border-radius: 4px;
-  margin: 0 2px;
+  border-radius: 0;
+  margin: 0;
   padding: 0;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 
   // 图标居中
   .el-icon {
@@ -103,6 +104,7 @@ const handleClose = () => {
     width: 100%;
     height: 100%;
     color: var(--text-secondary);
+    font-size: 14px;
   }
 
   // 去除默认聚焦样式
@@ -120,21 +122,32 @@ const handleClose = () => {
 // 最小化按钮
 .minimize-btn:hover {
   background-color: var(--bg-hover);
+  
+  :deep(.el-icon) {
+    color: var(--text-primary);
+  }
 }
 
 // 最大化按钮
 .maximize-btn:hover {
   background-color: var(--bg-hover);
+  
+  :deep(.el-icon) {
+    color: var(--text-primary);
+  }
 }
 
 // 关闭按钮 - 使用更醒目的红色
 .close-btn:hover {
   background-color: var(--accent-red);
+  
+  :deep(.el-icon) {
+    color: white;
+  }
 }
 
 // 修复按钮点击时的样式问题
 :deep(.el-button) {
-
   &:hover,
   &:focus {
     color: var(--text-primary);
@@ -143,5 +156,22 @@ const handleClose = () => {
   &:active {
     color: var(--text-primary);
   }
+}
+
+// 应用图标样式
+.app-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+// 应用标题样式
+.app-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+  
 }
 </style>

@@ -701,15 +701,16 @@ const getTypeLabel = (type: string) => {
 .content-item {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-light);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 12px;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   /* 收藏项目特殊样式 */
   &.favorite {
@@ -760,23 +761,26 @@ const getTypeLabel = (type: string) => {
   background: var(--bg-hover);
   border-color: var(--border-medium);
   transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .content-item.active {
   background: var(--bg-active);
   border-color: var(--accent-blue);
+  box-shadow: 0 0 0 1px var(--accent-blue), 0 3px 10px rgba(0, 136, 255, 0.2);
 }
 
 .item-icon {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   background: var(--bg-active);
-  border-radius: 8px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
   flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .item-content {
