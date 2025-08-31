@@ -137,16 +137,48 @@ export function clearClipboardHistory() {
 }
 
 /**
- * 获取剪贴板历史
- * @returns 剪贴板历史列表
+ * 获取剪贴板历史总数
+ * @returns 剪贴板历史总数
  */
-export function getClipboardHistory() {
+export function getClipboardHistoryCount() {
   try {
+    const countQuery = `
+      SELECT COUNT(*) as total FROM clipboard_items
+    `;
+    const result = db.prepare(countQuery).get();
+    return result.total;
+  } catch (error) {
+    console.error("Failed to get clipboard history count:", error);
+    return 0;
+  }
+}
+
+/**
+ * 获取剪贴板历史（支持分页）
+ * @param page 页码（从1开始）
+ * @param pageSize 每页数量
+ * @returns 剪贴板历史列表和总数
+ */
+export function getClipboardHistory(page = 1, pageSize = 50) {
+  try {
+    // 计算偏移量
+    const offset = (page - 1) * pageSize;
+    
+    // 获取总数
+    const total = getClipboardHistoryCount();
+    
+    // 获取分页数据
     const selectQuery = `
-      SELECT * FROM clipboard_items order by id desc
-    `
-    const rows = db.prepare(selectQuery).all();
-    return rows;
+      SELECT * FROM clipboard_items ORDER BY id DESC LIMIT ? OFFSET ?
+    `;
+    const items = db.prepare(selectQuery).all(pageSize, offset);
+    
+    return {
+      items,
+      total,
+      page,
+      pageSize
+    };
   } catch (error) {
     console.error("Failed to get clipboard history:", error);
     return [];

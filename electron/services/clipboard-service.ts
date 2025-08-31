@@ -75,9 +75,9 @@ export class ClipboardService {
       return clearClipboardHistory();
     });
 
-    // 获取剪贴板历史
-    ipcMain.handle("clipboard-get-history", () => {
-      return getClipboardHistory();
+    // 获取剪贴板历史（支持分页）
+    ipcMain.handle("clipboard-get-history", (_, page = 1, pageSize = 50) => {
+      return getClipboardHistory(page, pageSize);
     });
 
     // 设置剪贴板项目的收藏状态

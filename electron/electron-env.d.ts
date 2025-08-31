@@ -40,7 +40,12 @@ interface Window {
     saveItem: (item: any) => Promise<void>
     deleteItem: (id: number) => Promise<boolean>
     clearAll: () => Promise<boolean>
-    getHistory: () => Promise<any[]>
+    getHistory: (page: number, pageSize: number) => Promise<{
+      items: any[]
+      total: number
+      page: number
+      pageSize: number
+    }>
   }
   config: {
     // 通用配置方法
