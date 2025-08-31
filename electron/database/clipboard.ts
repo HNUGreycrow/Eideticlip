@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import fs from "node:fs";
+import { app } from "electron";
 
 // 在ES模块中模拟CommonJS的require功能（因为Electron有时需要使用CommonJS模块）
 const require = createRequire(import.meta.url);
@@ -20,21 +21,14 @@ let db: any = null;
 export function initDatabase(isDevelopment = false) {
   try {
     console.log("Initializing SQLite database");
-    // 关键：根据是否开发模式决定数据库路径
+
     function getDbPath() {
-      // 根据实际__dirname的值（dist-electron）调整路径
-      return isDevelopment
-        ? path.join(__dirname, "../database/clipboard.db") // 开发 -> 项目/database
-        : path.join(process.resourcesPath, "database/clipboard.db"); // 生产 -> 安装目录/resources/database
+      return path.join(app.getPath("userData"), "database/clipboard.db"); // 生产 -> %APPDATA%/<your-app-name>/database/clipboard.db
     }
 
     // 确保数据库目录存在
     const dbFile = getDbPath();
     const dbDir = path.dirname(dbFile);
-    // console.log(__dirname);
-    // console.log("数据库目录:", dbDir);
-    // console.log("数据库文件路径:", dbFile);
-
     if (!fs.existsSync(dbDir)) {
       console.log("创建数据库目录:", dbDir);
       fs.mkdirSync(dbDir, { recursive: true });
@@ -44,7 +38,6 @@ export function initDatabase(isDevelopment = false) {
     console.log("尝试创建或打开数据库:", dbFile);
     try {
       db = new Database(dbFile);
-      console.log("数据库创建/打开成功");
     } catch (dbError) {
       console.error("数据库创建/打开失败:", dbError);
       throw dbError;
