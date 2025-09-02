@@ -986,7 +986,7 @@ const getTypeLabel = (type: string) => {
 /* 内容项目 */
 .content-item {
   background: var(--bg-tertiary);
-  border: 1px solid var(--border-light);
+  border: 2px solid var(--border-light);
   border-radius: 10px;
   padding: 14px;
   margin-bottom: 10px;
@@ -994,7 +994,7 @@ const getTypeLabel = (type: string) => {
   transition: all 0.2s ease;
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 14px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
@@ -1009,7 +1009,12 @@ const getTypeLabel = (type: string) => {
     }
 
     &.active {
-      border-color: var(--favorite-border);
+      border: 2px solid transparent;
+      border-left: 3px solid var(--favorite-border);
+      background-image: linear-gradient(var(--bg-active), var(--bg-active)), 
+                        linear-gradient(135deg, var(--favorite-border) 0%, var(--accent-red) 100%);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
     }
 
     .icon-color {
@@ -1045,15 +1050,23 @@ const getTypeLabel = (type: string) => {
 
 .content-item:hover {
   background: var(--bg-hover);
-  border-color: var(--border-medium);
+  border: 2px solid transparent;
+  background-image: linear-gradient(var(--bg-hover), var(--bg-hover)), 
+                    linear-gradient(135deg, var(--gradient-hover-start) 0%, var(--gradient-hover-end) 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .content-item.active {
   background: var(--bg-active);
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 1px var(--accent-blue), 0 3px 10px rgba(0, 136, 255, 0.2);
+  border: 2px solid transparent;
+  background-image: linear-gradient(var(--bg-active), var(--bg-active)), 
+                    linear-gradient(135deg, var(--gradient-active-start) 0%, var(--gradient-active-end) 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 3px 10px rgba(0, 136, 255, 0.2);
 }
 
 .item-icon {

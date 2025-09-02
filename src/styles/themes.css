@@ -43,6 +43,12 @@
   --accent-purple: #8b5cf6;
   --accent-yellow: #f0c000;
   
+  /* 渐变色边框变量 - 深色主题 */
+  --gradient-hover-start: var(--accent-blue);
+  --gradient-hover-end: var(--accent-purple);
+  --gradient-active-start: var(--accent-blue);
+  --gradient-active-end: var(--accent-green);
+  
   /* 收藏项目颜色 */
   --favorite-bg: rgba(240, 192, 0, 0.05);
   --favorite-border: var(--accent-yellow);
@@ -93,6 +99,12 @@
 
   /* 强调色保持不变，但需要定义悬停状态 */
   --accent-blue-hover: #0070db; /* 按钮悬停状态 */
+  
+  /* 渐变色边框变量 - 浅色主题 */
+  --gradient-hover-start: #4facfe;
+  --gradient-hover-end: #00f2fe;
+  --gradient-active-start: #667eea;
+  --gradient-active-end: #764ba2;
   
   /* 收藏项目颜色 - 浅色主题专用 */
   --favorite-bg: rgba(240, 192, 0, 0.08);
@@ -148,6 +160,12 @@
   --accent-green:  #ff85a2;
   --accent-red:    #ff4757;
   --accent-purple: #da70d6;
+  
+  /* 渐变色边框变量 - 粉色主题 */
+  --gradient-hover-start: #ff9a9e;
+  --gradient-hover-end: #fecfef;
+  --gradient-active-start: #ff69b4;
+  --gradient-active-end: #da70d6;
 }
 
 /* ===== 橙色主题 ===== */
@@ -198,4 +216,10 @@
   --accent-green:  #ffa726;
   --accent-red:    #ff5722;
   --accent-purple: #e65100;
+  
+  /* 渐变色边框变量 - 橙色主题 */
+  --gradient-hover-start: #ffb74d;
+  --gradient-hover-end: #ff8a65;
+  --gradient-active-start: #ff8c00;
+  --gradient-active-end: #ff5722;
 }

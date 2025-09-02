@@ -40,13 +40,13 @@
           <i-ep-Document-Copy class="btn-icon" />
           <span>复制内容</span>
         </el-button>
-        <el-button 
-          class="detail-action-btn" 
+        <el-button
+          class="detail-action-btn"
           :type="item.is_favorite ? 'warning' : 'default'"
           @click="toggleFavorite(item)"
         >
           <i-ep-Star class="btn-icon" :filled="item.is_favorite" />
-          <span>{{ item.is_favorite ? '取消收藏' : '收藏' }}</span>
+          <span>{{ item.is_favorite ? "取消收藏" : "收藏" }}</span>
         </el-button>
         <el-button class="detail-action-btn" @click="deleteItem(item)">
           <i-ep-Delete class="btn-icon" />
@@ -65,8 +65,7 @@
 <script setup lang="ts">
 import { ClipboardItem } from "@/utils/type";
 
-interface Item extends ClipboardItem {
-}
+interface Item extends ClipboardItem {}
 
 const props = defineProps<{
   item: Item | null;
@@ -223,6 +222,8 @@ const formatTime = (timestamp: Date) => {
   white-space: pre-wrap;
   color: var(--text-primary);
   border: 1px solid var(--border-light);
+  max-height: 80vh;
+  overflow: auto;
 }
 
 .detail-meta {
