@@ -37,7 +37,7 @@ interface Window {
     startWatching: () => Promise<void>
     stopWatching: () => Promise<void>
     onChanged: (callback: (content: string) => void) => () => void
-    saveItem: (item: any) => Promise<void>
+    saveItem: (item: any) => Promise<number | null>
     deleteItem: (id: number) => Promise<boolean>
     clearAll: () => Promise<boolean>
     getHistory: (page: number, pageSize: number) => Promise<{

@@ -24,6 +24,8 @@ export class ClipboardService {
   private mainWindow: BrowserWindow | null = null;
   private lastClipboardContent: string = "";
   private isWatching: boolean = false;
+  private debounceTimer: NodeJS.Timeout | null = null;
+  private readonly DEBOUNCE_DELAY = 100; // 100ms防抖延迟
 
   /**
    * 构造函数
@@ -106,19 +108,29 @@ export class ClipboardService {
 
       // 监听剪贴板变化事件
       clipboardEvent.on("change", () => {
-        const currentContent = clipboard.readText();
-        console.log(clipboard.availableFormats());
-        // 如果内容变化了，通知渲染进程
-        if (
-          currentContent !== this.lastClipboardContent &&
-          currentContent.trim() !== ""
-        ) {
-          this.lastClipboardContent = currentContent;
-          this.mainWindow?.webContents.send(
-            "clipboard-changed",
-            currentContent
-          );
+        // 清除之前的防抖定时器
+        if (this.debounceTimer) {
+          clearTimeout(this.debounceTimer);
         }
+        
+        // 设置新的防抖定时器
+        this.debounceTimer = setTimeout(() => {
+          const currentContent = clipboard.readText();
+          console.log('Available formats:', clipboard.availableFormats());
+          
+          // 如果内容变化了，通知渲染进程
+          if (
+            currentContent !== this.lastClipboardContent &&
+            currentContent.trim() !== ""
+          ) {
+            this.lastClipboardContent = currentContent;
+            console.log('Clipboard content changed, notifying renderer');
+            this.mainWindow?.webContents.send(
+              "clipboard-changed",
+              currentContent
+            );
+          }
+        }, this.DEBOUNCE_DELAY);
       });
 
       this.isWatching = true;
@@ -155,6 +167,11 @@ export class ClipboardService {
    */
   public dispose(): void {
     this.stopWatching();
+    // 清理防抖定时器
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
     this.mainWindow = null;
   }
 }

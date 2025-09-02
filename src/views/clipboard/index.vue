@@ -403,7 +403,7 @@ const getContentType = (content: string) => {
 };
 
 // 添加新的剪贴板项目
-const addClipboardItem = (content: string) => {
+const addClipboardItem = async (content: string) => {
   // 检查内容是否已存在
   const exists = clipboardData.value.some((item) => item.content === content);
   if (exists) return;
@@ -415,7 +415,7 @@ const addClipboardItem = (content: string) => {
   const size = formatSize(new Blob([content]).size);
 
   // 创建新项目
-  const newItem: ClipboardItem = {
+  let newItem: ClipboardItem = {
     id: Date.now(),
     type,
     content,
@@ -423,22 +423,42 @@ const addClipboardItem = (content: string) => {
     size,
   };
 
-  // 保存到数据库
-  saveClipboardItem(newItem);
-
-  // 优化：直接添加到本地数据，避免重新加载整个历史记录
-  clipboardData.value = [newItem, ...clipboardData.value];
+  // 保存到数据库并获取生成的ID
+  try {
+    const savedItemId = await saveClipboardItem(newItem);
+    if (savedItemId) {
+      // 确保savedItemId是一个有效的ID
+      if (typeof savedItemId === 'number') {
+        newItem.id = savedItemId;
+      } else {
+        console.error('保存项目时返回的ID无效');
+      }
+      // 使用返回的项目id
+      clipboardData.value = [newItem, ...clipboardData.value];
+    } else {
+      // 如果保存失败，重新加载数据以保持一致性
+      loadClipboardHistory();
+    }
+  } catch (error) {
+    console.error('添加剪贴板项目失败:', error);
+    // 保存失败时重新加载数据
+    loadClipboardHistory();
+  }
 };
 
 /**
  * 保存单个剪贴板项到数据库
  * @param {ClipboardItem} item - 待保存的数据
- * @returns {Promise<void>}
+ * @returns {Promise<number | null>} 返回保存后的项目ID（包含数据库生成的ID）
  */
-const saveClipboardItem = (item: ClipboardItem) => {
-  window.clipboard.saveItem(item).catch((error) => {
+const saveClipboardItem = async (item: ClipboardItem): Promise<number | null> => {
+  try {
+    const savedItemId = await window.clipboard.saveItem(item);
+    return savedItemId;
+  } catch (error) {
     console.error("保存剪贴板项目出错:", error);
-  });
+    return null;
+  }
 };
 
 // 分页加载配置
@@ -534,9 +554,9 @@ const startClipboardWatcher = () => {
     .startWatching()
     .then(() => {
       // 设置变化回调
-      clipboardWatcherCleanup = window.clipboard.onChanged((content) => {
+      clipboardWatcherCleanup = window.clipboard.onChanged(async (content) => {
         if (content && content.trim() !== "") {
-          addClipboardItem(content);
+          await addClipboardItem(content);
         }
       });
     })

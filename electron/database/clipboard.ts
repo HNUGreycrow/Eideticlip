@@ -81,7 +81,7 @@ export function closeDatabase() {
 /**
  * 保存剪贴板项目
  * @param item 剪贴板项目
- * @returns 是否保存成功
+ * @returns 保存后的项目ID，失败时返回null
  */
 export function saveClipboardItem(item: any) {
   try {
@@ -93,11 +93,13 @@ export function saveClipboardItem(item: any) {
       INSERT INTO clipboard_items (content, type, timestamp, size, is_favorite)
       VALUES (?, ?, ?, ?, ?)
     `
-    db.prepare(insertQuery).run(item.content, item.type, timestamp, item.size, isFavorite);
-    return true;
+    const result = db.prepare(insertQuery).run(item.content, item.type, timestamp, item.size, isFavorite);
+    
+    // 返回插入的记录ID
+    return result.lastInsertRowid;
   } catch (error) {
     console.error("Failed to save clipboard item:", error);
-    return false;
+    return null;
   }
 }
 
