@@ -124,7 +124,6 @@ const formatTime = (timestamp: Date) => {
   height: 100%;
   background: var(--bg-secondary);
   border-left: 1px solid var(--border-light);
-  border-top: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;

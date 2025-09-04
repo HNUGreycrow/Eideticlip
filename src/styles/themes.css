@@ -3,18 +3,23 @@
   /* Element Plus 官方变量，覆盖即可 */
   --el-color-primary-rgb: 64, 158, 255;
   --el-color-primary: #0084ff;
+
   --el-bg-color: #181818;               /* 主背景（页面/整体）*/
   --el-bg-color-overlay: #1e1e1e;       /* 弹窗、抽屉、浮层背景 */
   --el-bg-color-page: #181818;          /* <body> 背景 */
+
   --el-text-color-primary: #ffffff;     /* 主文本 */
   --el-text-color-regular: #b3b3b3;     /* 普通文本 */
   --el-text-color-secondary: #777777;   /* 次文本/提示 */
+
   --el-border-color: #333333;
-  --el-border-color-light: #444444;
-  --el-border-color-lighter: #555555;
+  --el-border-color-light: #3c3c3c;
+  --el-border-color-lighter: #2c2c2c;
+
   --el-fill-color: #252525;             /* 表单填充、列表项 hover */
   --el-fill-color-light: #2a2a2a;
   --el-fill-color-blank: #181818;       /* 卡片、空白区域 */
+
   --el-mask-color: rgba(0, 0, 0, 0.8);  /* 遮罩层 */
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
 
@@ -50,7 +55,7 @@
   --gradient-active-end: var(--accent-green);
   
   /* 收藏项目颜色 */
-  --favorite-bg: rgba(240, 192, 0, 0.05);
+  --favorite-bg: rgba(255, 217, 102, 0.06);
   --favorite-border: var(--accent-yellow);
   --favorite-corner: var(--accent-yellow);
 
@@ -63,34 +68,39 @@
 /* ===== 浅色主题（通过给 <html> 或 <body> 加 .light 类启用） ===== */
 :root.light {
   /* Element Plus 官方变量 */
-  --el-color-primary-rgb: 64, 158, 255;
+  --el-color-primary-rgb: 91, 147, 255;
   --el-color-primary: #0084ff;
-  --el-bg-color: #ffffff;
-  --el-bg-color-overlay: #f5f7fa;
-  --el-bg-color-page: #f5f7fa;
-  --el-text-color-primary: #303133;
-  --el-text-color-regular: #606266;
-  --el-text-color-secondary: #909399;
+
+  --el-bg-color: #faf9f7;                        /* 页面背景，比纯白柔和 */
+  --el-bg-color-overlay: #f7f5f3;                /* 卡片 / 弹窗 */
+  --el-bg-color-page: #f7f5f3;
+
+  --el-text-color-primary: #2e2e2e;
+  --el-text-color-regular: #5c5c5c;
+  --el-text-color-secondary: #8a8a8a;
+  
   --el-border-color: #dcdfe6;
   --el-border-color-light: #e4e7ed;
   --el-border-color-lighter: #ebeef5;
-  --el-fill-color: #f0f2f5;
-  --el-fill-color-light: #f5f7fa;
-  --el-fill-color-blank: #ffffff;
+
+  --el-fill-color: #f2f0ed;
+  --el-fill-color-light: #f7f5f3;
+  --el-fill-color-blank: #ffffff; 
+
   --el-mask-color: rgba(0, 0, 0, 0.5);
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
 
   /* 自定义语义化背景变量 */
-  --bg-primary:   #ffffff;  /* 页面背景 */
-  --bg-secondary: #f5f7fa;  /* 卡片、侧边栏、弹窗背景 */
-  --bg-tertiary:  #f0f2f5;  /* 列表项、输入框背景 */
-  --bg-hover:     #e6f7ff;  /* hover 高亮（带主题色）*/
-  --bg-active:    #e6f7ff;
+  --bg-primary:   var(--el-bg-color);  /* 页面背景 */
+  --bg-secondary: var(--el-bg-color-overlay);  /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary:  var(--el-fill-color);  /* 列表项、输入框背景 */
+  --bg-hover:   #eef5ff;  /* hover 高亮（带主题色）*/
+  --bg-active:  #e5efff;
 
   /* 文本颜色 */
-  --text-primary:   #303133;
-  --text-secondary: #606266;
-  --text-tertiary:  #909399;
+  --text-primary:   var(--el-text-color-primary);
+  --text-secondary: var(--el-text-color-regular);
+  --text-tertiary:  var(--el-text-color-secondary);
   --text-inverse:   #ffffff;  /* 用于浅色背景上的"反色"文字 */
 
   /* 边框颜色 */
@@ -98,16 +108,16 @@
   --border-medium: #e4e7ed;
 
   /* 强调色保持不变，但需要定义悬停状态 */
-  --accent-blue-hover: #0070db; /* 按钮悬停状态 */
+  --accent-blue-hover: #4a85f5; /* 按钮悬停状态 */
   
   /* 渐变色边框变量 - 浅色主题 */
-  --gradient-hover-start: #4facfe;
-  --gradient-hover-end: #00f2fe;
-  --gradient-active-start: #667eea;
-  --gradient-active-end: #764ba2;
+  --gradient-hover-start: #7fa9ff;
+  --gradient-hover-end: #9ed8ff;
+  --gradient-active-start: #a7c3ff;
+  --gradient-active-end: #c3b1ff;
   
   /* 收藏项目颜色 - 浅色主题专用 */
-  --favorite-bg: rgba(240, 192, 0, 0.08);
+  --favorite-bg: rgba(255, 217, 102, 0.06);
   --favorite-border: var(--accent-yellow);
   --favorite-corner: var(--accent-yellow);
 }
@@ -117,18 +127,23 @@
   /* Element Plus 官方变量 */
   --el-color-primary-rgb: 255, 105, 180;
   --el-color-primary: #ff69b4;
+
   --el-bg-color: #fff0f5;
   --el-bg-color-overlay: #fff5f8;
   --el-bg-color-page: #fff0f5;
+
   --el-text-color-primary: #4a2b3a;
   --el-text-color-regular: #6d4e5c;
   --el-text-color-secondary: #8e6b7a;
+
   --el-border-color: #ffd1e1;
   --el-border-color-light: #ffe4ee;
   --el-border-color-lighter: #fff0f7;
+
   --el-fill-color: #fff5f9;
   --el-fill-color-light: #fffafc;
   --el-fill-color-blank: #ffffff;
+
   --el-mask-color: rgba(0, 0, 0, 0.5);
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
 
@@ -173,18 +188,23 @@
   /* Element Plus 官方变量 */
   --el-color-primary-rgb: 255, 140, 0;
   --el-color-primary: #ff8c00;
+
   --el-bg-color: #fffaf0;
   --el-bg-color-overlay: #fff8f0;
   --el-bg-color-page: #fffaf0;
+
   --el-text-color-primary: #4a3520;
   --el-text-color-regular: #6d5a40;
   --el-text-color-secondary: #8e7a60;
+
   --el-border-color: #ffd9a8;
   --el-border-color-light: #ffe4c4;
   --el-border-color-lighter: #fff0e0;
+
   --el-fill-color: #fff5e6;
   --el-fill-color-light: #fffaf5;
   --el-fill-color-blank: #ffffff;
+
   --el-mask-color: rgba(0, 0, 0, 0.5);
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
 

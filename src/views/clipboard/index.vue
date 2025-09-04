@@ -708,31 +708,31 @@ const getTypeLabel = (type: string) => {
             class="filter-tag"
             :class="{ active: activeFilter === 'all' }"
             @click="activeFilter = 'all'"
-            >全部</span
+            ><i-ep-Menu></i-ep-Menu> 全部</span
           >
           <span
             class="filter-tag"
             :class="{ active: activeFilter === 'text' }"
             @click="activeFilter = 'text'"
-            >文本</span
+            ><i-ep-Document></i-ep-Document> 文本</span
           >
           <span
             class="filter-tag"
             :class="{ active: activeFilter === 'url' }"
             @click="activeFilter = 'url'"
-            >链接</span
+            ><i-ep-Link></i-ep-Link> 链接</span
           >
           <span
             class="filter-tag"
             :class="{ active: activeFilter === 'code' }"
             @click="activeFilter = 'code'"
-            >代码</span
+            ><i-ep-Tickets></i-ep-Tickets> 代码</span
           >
           <span
             class="filter-tag"
             :class="{ active: activeFilter === 'favorite' }"
             @click="activeFilter = 'favorite'"
-            >收藏</span
+            ><i-ep-star></i-ep-star> 收藏</span
           >
           <!-- <span
             class="filter-tag"
@@ -768,11 +768,11 @@ const getTypeLabel = (type: string) => {
           >
             <div class="item-icon">
               <el-icon>
-                <i-ep-Document v-if="item.type === 'text'" />
-                <i-ep-Link v-else-if="item.type === 'url'" />
-                <i-ep-Tickets v-else-if="item.type === 'code'" />
-                <i-ep-Picture v-else-if="item.type === 'image'" />
-                <i-ep-Document v-else />
+                <i-ep-Document style="color: var(--accent-blue);" v-if="item.type === 'text'" />
+                <i-ep-Link style="color: var(--accent-green);" v-else-if="item.type === 'url'" />
+                <i-ep-Tickets style="color: var(--accent-purple);" v-else-if="item.type === 'code'" />
+                <i-ep-Picture style="color: var(--accent-red);" v-else-if="item.type === 'image'" />
+                <i-ep-Document style="color: var(--accent-blue);" v-else />
               </el-icon>
             </div>
             <div class="item-content">
@@ -780,11 +780,15 @@ const getTypeLabel = (type: string) => {
                 {{ truncateText(item.content, 100) }}
               </div>
               <div class="item-meta">
-                <span>{{ formatTime(item.timestamp) }}</span>
-                <span>•</span>
-                <span>{{ item.size }}</span>
-                <span>•</span>
-                <span>{{ getTypeLabel(item.type) }}</span>
+                <span class="meta-time">
+                  <i-ep-Clock class="meta-icon" /> {{ formatTime(item.timestamp) }}
+                </span>
+                <span class="meta-size">
+                  <i-ep-Document-Checked class="meta-icon" /> {{ item.size }}
+                </span>
+                <span class="meta-type" :class="`type-${item.type}`">
+                  <i-ep-InfoFilled class="meta-icon" /> {{ getTypeLabel(item.type) }}
+                </span>
               </div>
             </div>
             <div class="item-actions">
@@ -934,19 +938,39 @@ const getTypeLabel = (type: string) => {
 
 .search-filters {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 .filter-tag {
   padding: 4px 12px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-light);
-  border-radius: 16px;
+  border-radius: 20px;
   font-size: 12px;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  
+  &[data-type="text"]::before {
+    background-color: rgba(52, 152, 219, 0.9);
+  }
+  
+  &[data-type="url"]::before {
+    background-color: rgba(46, 204, 113, 0.9);
+  }
+  
+  &[data-type="code"]::before {
+    background-color: rgba(155, 89, 182, 0.9);
+  }
+  
+  &[data-type="favorite"]::before {
+    background-color: rgba(231, 76, 60, 0.9);
+  }
 }
 
 .filter-tag:hover {
@@ -974,7 +998,10 @@ const getTypeLabel = (type: string) => {
   overflow-y: auto;
   padding: 16px 24px;
   background: var(--bg-primary);
+  scroll-behavior: smooth;
+  position: relative;
 }
+
 
 /* 空状态 */
 .empty-state {
@@ -1009,9 +1036,9 @@ const getTypeLabel = (type: string) => {
   border: 2px solid var(--border-light);
   border-radius: 10px;
   padding: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 13px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   position: relative;
   display: flex;
   align-items: center;
@@ -1090,16 +1117,16 @@ const getTypeLabel = (type: string) => {
 }
 
 .item-icon {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   background: var(--bg-active);
-  border-radius: 9px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .item-content {
@@ -1108,31 +1135,74 @@ const getTypeLabel = (type: string) => {
 }
 
 .item-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text-primary);
-  margin-bottom: 4px;
-  line-height: 1.4;
+  margin-bottom: 6px;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   // 标准属性（未来兼容，目前主流浏览器尚未完全支持）
-  line-clamp: 3;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  letter-spacing: 0.01em;
 }
 
 .item-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   font-size: 12px;
   color: var(--text-secondary);
+  line-height: 1.4;
+  
+  .meta-icon {
+    font-size: 12px;
+    margin-right: 4px;
+    opacity: 0.9;
+    vertical-align: -2px;
+  }
+  
+  .meta-time, .meta-size, .meta-type {
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .meta-type {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.04);
+    font-weight: 500;
+    font-size: 11px;
+    
+    &.type-text {
+      background: rgba(52, 152, 219, 0.1);
+      color: rgba(52, 152, 219, 0.9);
+    }
+    
+    &.type-url {
+      background: rgba(46, 204, 113, 0.1);
+      color: rgba(46, 204, 113, 0.9);
+    }
+    
+    &.type-code {
+      background: rgba(155, 89, 182, 0.1);
+      color: rgba(155, 89, 182, 0.9);
+    }
+    
+    &.type-image {
+      background: rgba(231, 76, 60, 0.1);
+      color: rgba(231, 76, 60, 0.9);
+    }
+  }
 }
 
 .item-actions {
   display: flex;
   opacity: 0;
   transition: opacity 0.2s ease;
+  gap: 6px;
 }
 
 .content-item:hover .item-actions {
@@ -1140,11 +1210,11 @@ const getTypeLabel = (type: string) => {
 }
 
 .item-action-btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   min-height: auto;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1152,6 +1222,12 @@ const getTypeLabel = (type: string) => {
   font-size: 14px;
   transition: all 0.2s ease;
   color: var(--text-secondary);
+  margin-left: 2px;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+  }
 }
 
 /* 加载指示器样式 */
