@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 import { ClipboardItem } from "@/utils/type";
+import { formatTime, getTypeLabel } from "@/utils/utils";
 
 interface Item extends ClipboardItem {}
 
@@ -93,28 +94,6 @@ const deleteItem = (item: Item) => {
 
 const toggleFavorite = (item: Item) => {
   emit("favorite", item);
-};
-
-const getTypeLabel = (type: string) => {
-  const labels = {
-    text: "文本",
-    url: "链接",
-    code: "代码",
-    image: "图片",
-  };
-  return labels[type as keyof typeof labels] || "文本";
-};
-
-const formatTime = (timestamp: Date) => {
-  const date = new Date(timestamp);
-  return date.toLocaleString("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
 };
 </script>
 
