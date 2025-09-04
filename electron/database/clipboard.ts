@@ -139,6 +139,50 @@ export function clearClipboardHistory() {
 }
 
 /**
+ * 清除过期的剪贴板记录（保留收藏的记录）
+ * @param retentionDays 保留天数
+ * @returns 清除的记录数量
+ */
+export function clearExpiredClipboardItems(retentionDays: number) {
+  try {
+    // 计算过期时间点
+    const expiredDate = new Date();
+    expiredDate.setDate(expiredDate.getDate() - retentionDays);
+    const expiredTimestamp = expiredDate.toISOString();
+    
+    console.log(`清除 ${expiredTimestamp} 之前的非收藏记录`);
+    
+    // 删除过期且非收藏的记录
+    const deleteQuery = `
+      DELETE FROM clipboard_items 
+      WHERE timestamp < ? AND is_favorite = 0
+    `;
+    const result = db.prepare(deleteQuery).run(expiredTimestamp);
+    
+    // 如果删除了记录，重新整理ID序列
+    if (result.changes > 0) {
+      // 获取当前最大ID
+      const maxIdResult = db.prepare('SELECT MAX(id) as maxId FROM clipboard_items').get();
+      const maxId = maxIdResult?.maxId || 0;
+      
+      // 重置自增序列
+      if (maxId > 0) {
+        db.prepare(`UPDATE sqlite_sequence SET seq = ? WHERE name = 'clipboard_items'`).run(maxId);
+      } else {
+        // 如果没有记录了，删除序列记录
+        db.prepare(`DELETE FROM sqlite_sequence WHERE name = 'clipboard_items'`).run();
+      }
+    }
+    
+    console.log(`已清除 ${result.changes} 条过期记录`);
+    return result.changes;
+  } catch (error) {
+    console.error('Failed to clear expired clipboard items:', error);
+    return 0;
+  }
+}
+
+/**
  * 获取剪贴板历史总数
  * @returns 剪贴板历史总数
  */

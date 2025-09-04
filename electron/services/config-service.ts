@@ -5,6 +5,7 @@ interface ConfigSchema {
   theme: 'light' | 'dark' | 'pink' | 'orange';
   shortcut: string;
   minimizeToTray: boolean;
+  dataRetentionDays: number; // 数据保存天数
   // 可以在这里添加更多配置项
   [key: string]: any; // 允许任意键值对
 }
@@ -29,7 +30,8 @@ export class ConfigService {
       defaults: {
         theme: 'dark',
         shortcut: 'CommandOrControl+Alt+C',
-        minimizeToTray: false
+        minimizeToTray: false,
+        dataRetentionDays: 1 // 默认保存1天
       },
       // 配置文件名
       name: 'config',

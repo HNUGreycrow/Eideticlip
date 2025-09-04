@@ -2,7 +2,7 @@ import { app, ipcMain } from "electron"; // 导入Electron核心模块：app(应
 import { fileURLToPath } from "node:url"; // 导入Node模块：将URL转换为文件路径
 import path from "node:path"; // 导入Node模块：处理文件路径
 // 导入数据库服务
-import { initDatabase, closeDatabase } from "./database/clipboard";
+import { initDatabase, closeDatabase, clearExpiredClipboardItems } from "./database/clipboard";
 // 导入自定义服务
 import {
   WindowService,
@@ -111,6 +111,11 @@ app.on("activate", () => {
 function initializeServices() {
   // 创建配置服务（最先初始化，因为其他服务可能依赖它）
   configService = new ConfigService();
+  
+  // 清除过期的剪贴板记录
+  const retentionDays = configService.get<number>('dataRetentionDays');
+  const clearedCount = clearExpiredClipboardItems(retentionDays);
+  console.log(`Cleared ${clearedCount} expired clipboard items on startup`);
   
   // 创建窗口服务
   windowService = new WindowService(

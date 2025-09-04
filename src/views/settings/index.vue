@@ -16,6 +16,7 @@ const tempKeys = ref<string[]>([]);
 const isRecording = ref(false);
 const shortcutInput = ref();
 const minimizeToTray = ref<boolean>(false);
+const dataRetentionDays = ref<number>(1);
 const isLoading = ref<boolean>(false);
 
 // 点击输入框时清空内容并开始记录
@@ -111,6 +112,7 @@ onMounted(async () => {
   theme.value = themeService.currentTheme.value;
 
   minimizeToTray.value = await window.config.get<boolean>("minimizeToTray");
+  dataRetentionDays.value = await window.config.get<number>("dataRetentionDays");
 
   // 获取当前快捷键
   window.ipcRenderer.once("shortcut-current", (_event, currentShortcut) => {
@@ -128,6 +130,11 @@ const handleThemeChange = (value: ThemeType) => {
 
 const handleMinimizeToTrayChange = (value: boolean) => {
   window.config.set("minimizeToTray", value);
+};
+
+const handleDataRetentionChange = (value: number) => {
+  window.config.set("dataRetentionDays", value);
+  ElMessage.success(`数据保存时间已设置为 ${value} 天`);
 };
 
 let removeListener: (() => void) | null = null;
@@ -188,6 +195,25 @@ const checkForUpdates = async () => {
             v-model="minimizeToTray"
             @change="handleMinimizeToTrayChange"
           ></el-switch>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">
+            <span>数据保存时间</span>
+            <div class="setting-description">
+              设置剪贴板记录的保存天数（1-30天），每次启动时会自动删除过期记录，收藏的记录不会被清除
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <el-input-number
+              v-model="dataRetentionDays"
+              :min="1"
+              :max="30"
+              :step="1"
+              step-strictly
+              @change="handleDataRetentionChange"
+            />
+            <span style="min-width: 30px; color: var(--el-text-color-regular); font-size: 12px;">天</span>
+          </div>
         </div>
       </el-card>
 
