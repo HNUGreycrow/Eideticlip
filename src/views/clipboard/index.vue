@@ -269,9 +269,6 @@ const HTML_PARTIAL = /<[\w\-]+[^>]*>|<\/[\w\-]+>/;
 const INDENT_PATTERN = /^(\s+)\S/;
 const SENTENCE_PATTERN = /[.!?]+\s/;
 
-// 使用记忆化缓存优化内容类型检测
-const contentTypeCache = new Map<string, string>();
-
 /**
  * 推断剪贴板内容的类型
  * @param {string} content - 剪贴板文本
@@ -280,14 +277,9 @@ const contentTypeCache = new Map<string, string>();
  * getContentType("const a = 1") // => "code"
  */
 const getContentType = (content: string) => {
-  // 检查缓存
-  if (contentTypeCache.has(content)) {
-    return contentTypeCache.get(content)!;
-  }
 
   // 对于非常短的内容，快速判断为文本
   if (content.length < 5) {
-    contentTypeCache.set(content, "text");
     return "text";
   }
 
@@ -391,13 +383,6 @@ const getContentType = (content: string) => {
   } else {
     type = "text"; // 默认为文本
   }
-
-  // 缓存结果 - 限制缓存大小以避免内存泄漏
-  if (contentTypeCache.size > 1000) {
-    // 如果缓存太大，清除它
-    contentTypeCache.clear();
-  }
-  contentTypeCache.set(content, type);
 
   return type;
 };
