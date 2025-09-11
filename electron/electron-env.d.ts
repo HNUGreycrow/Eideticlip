@@ -40,7 +40,7 @@ interface Window {
     saveItem: (item: any) => Promise<number | null>
     deleteItem: (id: number) => Promise<boolean>
     clearAll: () => Promise<boolean>
-    getHistory: (page: number, pageSize: number) => Promise<{
+    getHistory: (page: number, pageSize: number, type: string) => Promise<{
       items: any[]
       total: number
       page: number

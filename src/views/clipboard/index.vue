@@ -20,6 +20,13 @@ let clipboardWatcherCleanup: (() => void) | null = null; // 剪贴板监听清�
 // 剪贴板数据
 const clipboardData = ref<ClipboardItem[]>([]);
 
+// 监听类型过滤器变化，重新加载数据
+watch(activeFilter, (newType) => {
+  // 切换类型时，重置页码并重新加载数据
+  currentPage.value = 1;
+  loadClipboardHistory(1, false, newType);
+});
+
 // 搜索防抖定时器
 let searchDebounceTimer: number | null = null;
 
@@ -43,29 +50,20 @@ watch(searchQuery, (newValue) => {
  */
 const getClipboardData = computed(() => {
   const query = debouncedSearchQuery.value.trim().toLowerCase();
-  const currentFilter = activeFilter.value;
-
-  // 优化：根据过滤器类型预先过滤，减少后续处理的数据量
-  let preFiltered = clipboardData.value;
-
-  // 先按类型过滤，这通常可以大幅减少需要进行内容搜索的项目数量
-  if (currentFilter !== "all") {
-    if (currentFilter === "favorite") {
-      preFiltered = preFiltered.filter((item) => !!item.is_favorite);
-    } else {
-      preFiltered = preFiltered.filter((item) => item.type === currentFilter);
-    }
+  
+  // 数据库已经按类型过滤，这里只需要处理搜索查询
+  if (!query) {
+    // 没有搜索查询，直接返回数据库过滤后的结果
+    return clipboardData.value;
   }
-
-  // 有搜索查询时，在预过滤结果上进行内容搜索
+  
+  // 有搜索查询时，在数据库过滤结果上进行内容搜索
   // 优化：对于大量数据，使用索引检查而不是includes可以提高性能
-  const result = preFiltered.filter((item) => {
+  return clipboardData.value.filter((item) => {
     if (!item.content || typeof item.content !== "string") return false;
     const lowerContent = item.content.toLowerCase();
     return lowerContent.indexOf(query) !== -1;
   });
-
-  return result;
 });
 
 const isOpen = ref(false);
@@ -308,22 +306,21 @@ const isLoadingMore = ref(false); // 是否正在加载更多
  * 分页加载剪贴板历史
  * @param {number} [page=1] - 页码
  * @param {boolean} [append=false] - 是否追加模式
+ * @param {string} [type] - 筛选类型
  * @returns {Promise<void>}
  */
-const loadClipboardHistory = (page = 1, append = false) => {
+const loadClipboardHistory = (page = 1, append = false, type = activeFilter.value) => {
   isLoadingMore.value = true;
   currentPage.value = page;
 
-  // 获取总数和历史记录
+  // 获取总数和历史记录，传入当前选中的类型
   window.clipboard
-    .getHistory(page, pageSize.value)
+    .getHistory(page, pageSize.value, type)
     .then((result) => {
       if (result && result.total !== undefined) {
         totalItems.value = result.total;
       }
-
-      console.log(result);
-
+      // console.log(result);
       const history = result?.items || [];
 
       if (history && Array.isArray(history) && history.length > 0) {
@@ -372,7 +369,7 @@ const loadMoreData = () => {
   if (clipboardData.value.length >= totalItems.value) return;
 
   const nextPage = currentPage.value + 1;
-  loadClipboardHistory(nextPage, true);
+  loadClipboardHistory(nextPage, true, activeFilter.value);
 };
 
 /**
@@ -446,7 +443,7 @@ const handleScroll = () => {
 // 组件挂载时启动监听，加载历史记录，卸载时停止监听
 onMounted(() => {
   // 加载历史记录（只加载第一页）
-  loadClipboardHistory(1, false);
+  loadClipboardHistory(1, false, activeFilter.value);
   // 启动剪贴板监听
   startClipboardWatcher();
 });
@@ -477,7 +474,7 @@ const exportData = () => {
       <div class="content-header">
         <div class="header-left">
           <h1 class="header-title">剪切板历史</h1>
-          <span class="header-stats">共 {{ clipboardData.length }} 条记录</span>
+          <span class="header-stats">共 {{ totalItems }} 条记录 (已加载 {{ clipboardData.length }} 条)</span>
         </div>
         <div class="header-actions">
           <el-tooltip content="停止/启动自动监听剪贴板" placement="top">

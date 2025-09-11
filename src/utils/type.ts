@@ -26,7 +26,7 @@ export interface clipboardAPI {
   saveItem: (item: ClipboardItem) => Promise<void>;
   deleteItem: (id: number) => Promise<boolean>;
   clearAll: () => Promise<boolean>;
-  getHistory: () => Promise<ClipboardItem[]>;
+  getHistory: (page: number, pageSize: number, type: string) => Promise<{items: ClipboardItem[], total: number, page: number, pageSize: number}>;
   // 收藏相关API
   setFavorite: (id: number, isFavorite: boolean) => Promise<boolean>;
   getFavorites: () => Promise<ClipboardItem[]>;

@@ -50,7 +50,7 @@ contextBridge.exposeInMainWorld('clipboard', {
   saveItem: (item: any) => ipcRenderer.invoke('clipboard-save-item', item),
   deleteItem: (id: number) => ipcRenderer.invoke('clipboard-delete-item', id),
   clearAll: () => ipcRenderer.invoke('clipboard-clear-all'),
-  getHistory: (page: number, pageSize: number) => ipcRenderer.invoke('clipboard-get-history', page, pageSize),
+  getHistory: (page: number, pageSize: number, type: string) => ipcRenderer.invoke('clipboard-get-history', page, pageSize, type),
   // 收藏相关API
   setFavorite: (id: number, isFavorite: boolean) => ipcRenderer.invoke('clipboard-set-favorite', id, isFavorite),
   getFavorites: () => ipcRenderer.invoke('clipboard-get-favorites')

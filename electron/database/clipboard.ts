@@ -200,24 +200,70 @@ export function getClipboardHistoryCount() {
 }
 
 /**
- * 获取剪贴板历史（支持分页）
+ * 获取剪贴板历史（支持分页和按类型筛选）
  * @param page 页码（从1开始）
  * @param pageSize 每页数量
+ * @param type 可选的类型筛选
  * @returns 剪贴板历史列表和总数
  */
-export function getClipboardHistory(page = 1, pageSize = 50) {
+export function getClipboardHistory(page = 1, pageSize = 50, type = "all") {
   try {
     // 计算偏移量
     const offset = (page - 1) * pageSize;
     
+    // 根据是否有类型筛选构建不同的查询
+    let selectQuery, countQuery;
+    let params = [];
+    
+    if (type && type !== 'all' && type !== 'favorite') {
+      // 按类型筛选
+      selectQuery = `
+        SELECT * FROM clipboard_items 
+        WHERE type = ? 
+        ORDER BY id DESC LIMIT ? OFFSET ?
+      `;
+      countQuery = `
+        SELECT COUNT(*) as total FROM clipboard_items 
+        WHERE type = ?
+      `;
+      params = [type, pageSize, offset];
+    } else if (type === 'favorite') {
+      // 收藏筛选
+      selectQuery = `
+        SELECT * FROM clipboard_items 
+        WHERE is_favorite = 1 
+        ORDER BY id DESC LIMIT ? OFFSET ?
+      `;
+      countQuery = `
+        SELECT COUNT(*) as total FROM clipboard_items 
+        WHERE is_favorite = 1
+      `;
+      params = [pageSize, offset];
+    } else {
+      // 不筛选
+      selectQuery = `
+        SELECT * FROM clipboard_items 
+        ORDER BY id DESC LIMIT ? OFFSET ?
+      `;
+      countQuery = `
+        SELECT COUNT(*) as total FROM clipboard_items
+      `;
+      params = [pageSize, offset];
+    }
+    
     // 获取总数
-    const total = getClipboardHistoryCount();
+    let totalResult;
+    if (type && type !== 'all' && type !== 'favorite') {
+      totalResult = db.prepare(countQuery).get(type);
+    } else if (type === 'favorite') {
+      totalResult = db.prepare(countQuery).get();
+    } else {
+      totalResult = db.prepare(countQuery).get();
+    }
+    const total = totalResult ? totalResult.total : 0;
     
     // 获取分页数据
-    const selectQuery = `
-      SELECT * FROM clipboard_items ORDER BY id DESC LIMIT ? OFFSET ?
-    `;
-    const items = db.prepare(selectQuery).all(pageSize, offset);
+    const items = db.prepare(selectQuery).all(...params);
     
     return {
       items,
