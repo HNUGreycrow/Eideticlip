@@ -13,6 +13,20 @@ import {
   UpdateService,
 } from "./services";
 
+// 防止多开：单实例锁
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  // 如果获取锁失败，说明已有实例在运行，直接退出
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    // 当用户尝试打开第二个实例时，聚焦已有窗口
+    if (windowService) {
+      windowService.showAndFocus();
+    }
+  });
+}
 
 // 获取当前文件的目录路径（__dirname在ES模块中需手动定义）
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

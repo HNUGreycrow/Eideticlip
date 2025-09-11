@@ -115,6 +115,22 @@ export class WindowService {
   }
 
   /**
+   * 安全地显示并聚焦窗口
+   * 适用于：单实例二次启动、托盘点击、全局快捷键
+   */
+  public showAndFocus(): void {
+    if (!this.win) return; // 窗口还没创建就忽略
+
+    if (this.win.isMinimized()) {
+      this.win.restore(); // 从最小化恢复
+    }
+    if (!this.win.isVisible()) {
+      this.win.show(); // 从“隐藏到托盘”恢复
+    }
+    this.win.focus(); // 抢焦点
+  }
+
+  /**
    * 获取当前窗口实例
    * @returns 当前窗口实例或null
    */
