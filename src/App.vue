@@ -1,11 +1,22 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { themeService } from './utils/theme';
-import UpdateDialog from './components/UpdateDialog.vue';
+import { onMounted } from "vue";
+import { themeService } from "./utils/theme";
+import UpdateDialog from "./components/UpdateDialog.vue";
+import router from "./router";
 
-onMounted(() => {
+// 在 App.vue 的 onMounted 钩子中添加
+onMounted(async () => {
   // 初始化主题
   themeService.initTheme();
+
+  // 主动检查版本
+  const currentVersion = await window.ipcRenderer.invoke("app-get-version");
+  const savedVersion = await window.config.get("version");
+
+  if (savedVersion !== currentVersion) {
+    await window.config.set("version", currentVersion);
+    router.push("/changelog");
+  }
 });
 </script>
 
@@ -15,7 +26,7 @@ onMounted(() => {
 </template>
 
 <style>
-@import './styles/themes.css';
+@import "./styles/themes.css";
 
 /* 响应式布局 */
 @media (max-width: 768px) {
@@ -30,11 +41,14 @@ onMounted(() => {
   }
 }
 
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+    sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -77,7 +91,10 @@ html, body, #app {
   --el-button-bg-color: var(--accent-blue);
   --el-button-text-color: var(--text-inverse);
   --el-button-border-color: var(--accent-blue);
-  --el-button-hover-bg-color: var(--accent-blue-hover, var(--bg-active)); /* 使用主题变量 */
+  --el-button-hover-bg-color: var(
+    --accent-blue-hover,
+    var(--bg-active)
+  ); /* 使用主题变量 */
   --el-button-hover-border-color: var(--accent-blue-hover, var(--bg-active));
   --el-button-hover-text-color: var(--text-inverse);
 }

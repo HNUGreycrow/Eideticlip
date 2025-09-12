@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { themeService } from "../../utils/theme";
 import type { ThemeType } from "../../utils/theme";
+import { useRouter } from "vue-router";
 import { checkShortcut } from "@/utils/validate";
 // 使用预加载脚本中暴露的API，而不是直接导入electron
 
@@ -18,6 +19,7 @@ const shortcutInput = ref();
 const minimizeToTray = ref<boolean>(false);
 const dataRetentionDays = ref<number>(1);
 const isLoading = ref<boolean>(false);
+const router = useRouter();
 
 // 点击输入框时清空内容并开始记录
 const startRecording = () => {
@@ -158,6 +160,11 @@ const checkForUpdates = async () => {
     isLoading.value = false;
   }
 };
+
+// 查看更新日志
+const viewChangelog = () => {
+  router.push('/changelog');
+};
 </script>
 
 <template>
@@ -267,6 +274,17 @@ const checkForUpdates = async () => {
             </el-button>
           </div>
         </div>
+        <div class="setting-item">
+          <div class="setting-label">
+            <span>更新日志</span>
+            <div class="setting-description">查看应用更新历史</div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center">
+            <el-button @click="viewChangelog">
+              查看日志
+            </el-button>
+          </div>
+        </div>
       </el-card>
     </div>
   </div>
@@ -290,9 +308,9 @@ const checkForUpdates = async () => {
 }
 
 .content {
-  display: flex;
-  flex-direction: column;
   padding: 24px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .setting-card {

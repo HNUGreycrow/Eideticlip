@@ -31,7 +31,8 @@ export class ConfigService {
         theme: 'dark',
         shortcut: 'CommandOrControl+Alt+C',
         minimizeToTray: false,
-        dataRetentionDays: 1 // 默认保存1天
+        dataRetentionDays: 1, // 默认保存1天
+        version: '1.0.0'
       },
       // 配置文件名
       name: 'config',

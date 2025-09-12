@@ -9,6 +9,7 @@ const routes = [
     children: [
       { path: "/clipboard", name: "clipboard", component: () => import("@/views/clipboard/index.vue") },
       { path: "/settings", name: "settings", component: () => import("@/views/settings/index.vue") },
+      { path: "/changelog", name: "changelog", component: () => import("@/views/changelog/index.vue") },
       { path: "", redirect: "/clipboard" },
     ],
   },
