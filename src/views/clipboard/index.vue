@@ -164,28 +164,40 @@ const deleteItem = (itemOrId: ClipboardItem | number, event?: Event) => {
 
   const id = typeof itemOrId === "number" ? itemOrId : itemOrId.id;
 
-  // 从数据库中删除
+  // 先在本地移除对应项
+  const index = clipboardData.value.findIndex(item => item.id === id);
+  if (index !== -1) {
+    clipboardData.value.splice(index, 1);
+    // 更新总数
+    totalItems.value -= 1;
+    
+    // 如果当前选中的是被删除的项目，则清空选中
+    if (selectedItem.value?.id === id) {
+      selectedItem.value = null;
+    }
+    
+    ElMessage({
+      message: "删除成功",
+      type: "success",
+    });
+  }
+
+  // 从数据库中删除（后台操作，不影响用户体验）
   window.clipboard
     .deleteItem(id)
     .then((success) => {
-      if (success) {
-        loadClipboardHistory();
-        // 如果当前选中的是被删除的项目，则清空选中
-        if (selectedItem.value?.id === id) {
-          selectedItem.value = null;
-        }
-      } else {
+      if (!success) {
         console.error("删除剪贴板项目失败");
-        ElMessage({
-          message: "删除失败",
-          type: "error",
-        });
+        // 如果数据库删除失败，重新加载数据以保持一致性
+        loadClipboardHistory();
       }
     })
     .catch((error) => {
       console.error("删除剪贴板项目出错:", error);
+      // 发生错误时重新加载数据以保持一致性
+      loadClipboardHistory();
       ElMessage({
-        message: "删除失败",
+        message: "删除失败，请重试",
         type: "error",
       });
     });
@@ -196,7 +208,7 @@ const deleteItem = (itemOrId: ClipboardItem | number, event?: Event) => {
  * @returns {void}
  */
 const clearAll = () => {
-  ElMessageBox.confirm("确定要清空所有记录吗？", "Warning", {
+  ElMessageBox.confirm("确定要清空所有记录吗?（包括收藏记录）", "Warning", {
     confirmButtonText: "确认",
     cancelButtonText: "取消",
     type: "warning",
@@ -209,6 +221,8 @@ const clearAll = () => {
           // 清空本地数据
           clipboardData.value = [];
           selectedItem.value = null;
+          // 更新总数
+          totalItems.value = 0;
           ElMessage({
             message: "已清空所有记录",
             type: "success",
@@ -275,6 +289,8 @@ const addClipboardItem = async (content: string) => {
       }
       // 使用返回的项目id
       clipboardData.value = [newItem, ...clipboardData.value];
+      // 更新总数
+      totalItems.value += 1;
     } else {
       // 如果保存失败，重新加载数据以保持一致性
       loadClipboardHistory();

@@ -1,13 +1,10 @@
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import fs from "node:fs";
 import { app } from "electron";
 
 // 在ES模块中模拟CommonJS的require功能（因为Electron有时需要使用CommonJS模块）
 const require = createRequire(import.meta.url);
-// 获取当前文件的目录路径（__dirname在ES模块中需手动定义）
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const Database = require("better-sqlite3");
 
 // 数据库连接实例
@@ -15,10 +12,10 @@ let db: any = null;
 
 /**
  * 初始化数据库
- * @param isDevelopment 是否为开发环境
+ * @param _isDevelopment 是否为开发环境
  * @returns 数据库实例
  */
-export function initDatabase(isDevelopment = false) {
+export function initDatabase(_isDevelopment = false) {
   try {
     console.log("Initializing SQLite database");
 
