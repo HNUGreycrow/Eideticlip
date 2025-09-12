@@ -265,6 +265,11 @@ const addClipboardItem = async (content: string) => {
   // 确定内容类型
   const type = getContentType(content);
 
+  // 检查当前筛选类型，如果不是"all"且类型不匹配，则不添加到当前视图
+  const shouldAddToCurrentView = activeFilter.value === "all" || 
+    activeFilter.value === type || 
+    (activeFilter.value === "favorite" && false); // 收藏类型需要单独处理
+
   // 计算大小
   const size = formatSize(new Blob([content]).size);
 
@@ -287,10 +292,14 @@ const addClipboardItem = async (content: string) => {
       } else {
         console.error("保存项目时返回的ID无效");
       }
-      // 使用返回的项目id
-      clipboardData.value = [newItem, ...clipboardData.value];
-      // 更新总数
-      totalItems.value += 1;
+      
+      // 只有当类型匹配当前筛选条件时，才添加到当前视图
+      if (shouldAddToCurrentView) {
+        // 使用返回的项目id
+        clipboardData.value = [newItem, ...clipboardData.value];
+        // 更新总数
+        totalItems.value += 1;
+      }
     } else {
       // 如果保存失败，重新加载数据以保持一致性
       loadClipboardHistory();
