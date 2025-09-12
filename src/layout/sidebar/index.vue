@@ -1,13 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import About from './about/index.vue';
 import router from '@/router';
+import { useRoute } from 'vue-router';
 
-const activeModule = ref('clipboard');
+const route = useRoute();
 const aboutRef = ref();
 
+// 根据当前路由路径计算当前激活的模块
+const activeModule = computed(() => {
+  const path = route.path;
+  if (path.includes('/settings')) {
+    return 'settings';
+  } else if (path.includes('/clipboard')) {
+    return 'clipboard';
+  }
+  return '';
+});
+
 const switchModule = (module: string) => {
-  activeModule.value = module;
   if (module === 'settings') {
     router.push('/settings');
   } else if (module === 'clipboard') {
@@ -29,16 +40,7 @@ const openAbout = () => {
       @click="switchModule('clipboard')"
     >
       <i-ep-document-copy />
-      <!-- <span class="nav-badge">24</span> -->
     </button>
-    <!-- <button 
-      class="nav-item" 
-      :class="{ active: activeModule === 'favorites' }" 
-      title="收藏" 
-      @click="switchModule('favorites')"
-    >
-      <i-ep-star />
-    </button> -->
     <div class="nav-divider"></div>
     <button 
       class="nav-item" 
@@ -50,7 +52,6 @@ const openAbout = () => {
     </button>
     <button 
       class="nav-item" 
-      :class="{ active: activeModule === 'about' }" 
       title="关于" 
       @click="openAbout"
     >

@@ -2,7 +2,12 @@
 import { computed, ref, onMounted, onUnmounted, watch } from "vue";
 import DetailPanel from "./components/DetailPanel.vue";
 import { ClipboardItem } from "@/utils/type";
-import { formatSize, getContentType, formatTime, getTypeLabel } from "@/utils/utils";
+import {
+  formatSize,
+  getContentType,
+  formatTime,
+  getTypeLabel,
+} from "@/utils/utils";
 
 // 定义组件名称，用于keep-alive识别
 defineOptions({
@@ -50,13 +55,13 @@ watch(searchQuery, (newValue) => {
  */
 const getClipboardData = computed(() => {
   const query = debouncedSearchQuery.value.trim().toLowerCase();
-  
+
   // 数据库已经按类型过滤，这里只需要处理搜索查询
   if (!query) {
     // 没有搜索查询，直接返回数据库过滤后的结果
     return clipboardData.value;
   }
-  
+
   // 有搜索查询时，在数据库过滤结果上进行内容搜索
   // 优化：对于大量数据，使用索引检查而不是includes可以提高性能
   return clipboardData.value.filter((item) => {
@@ -263,10 +268,10 @@ const addClipboardItem = async (content: string) => {
     const savedItemId = await saveClipboardItem(newItem);
     if (savedItemId) {
       // 确保savedItemId是一个有效的ID
-      if (typeof savedItemId === 'number') {
+      if (typeof savedItemId === "number") {
         newItem.id = savedItemId;
       } else {
-        console.error('保存项目时返回的ID无效');
+        console.error("保存项目时返回的ID无效");
       }
       // 使用返回的项目id
       clipboardData.value = [newItem, ...clipboardData.value];
@@ -275,7 +280,7 @@ const addClipboardItem = async (content: string) => {
       loadClipboardHistory();
     }
   } catch (error) {
-    console.error('添加剪贴板项目失败:', error);
+    console.error("添加剪贴板项目失败:", error);
     // 保存失败时重新加载数据
     loadClipboardHistory();
   }
@@ -286,7 +291,9 @@ const addClipboardItem = async (content: string) => {
  * @param {ClipboardItem} item - 待保存的数据
  * @returns {Promise<number | null>} 返回保存后的项目ID（包含数据库生成的ID）
  */
-const saveClipboardItem = async (item: ClipboardItem): Promise<number | null> => {
+const saveClipboardItem = async (
+  item: ClipboardItem
+): Promise<number | null> => {
   try {
     const savedItemId = await window.clipboard.saveItem(item);
     return savedItemId;
@@ -309,7 +316,11 @@ const isLoadingMore = ref(false); // 是否正在加载更多
  * @param {string} [type] - 筛选类型
  * @returns {Promise<void>}
  */
-const loadClipboardHistory = (page = 1, append = false, type = activeFilter.value) => {
+const loadClipboardHistory = (
+  page = 1,
+  append = false,
+  type = activeFilter.value
+) => {
   isLoadingMore.value = true;
   currentPage.value = page;
 
@@ -474,7 +485,10 @@ const exportData = () => {
       <div class="content-header">
         <div class="header-left">
           <h1 class="header-title">剪切板历史</h1>
-          <span class="header-stats">共 {{ totalItems }} 条记录 (已加载 {{ clipboardData.length }} 条)</span>
+          <span class="header-stats"
+            >共 {{ totalItems }} 条记录 (已加载
+            {{ clipboardData.length }} 条)</span
+          >
         </div>
         <div class="header-actions">
           <el-tooltip content="停止/启动自动监听剪贴板" placement="top">
@@ -578,11 +592,23 @@ const exportData = () => {
           >
             <div class="item-icon">
               <el-icon>
-                <i-ep-Document style="color: var(--accent-blue);" v-if="item.type === 'text'" />
-                <i-ep-Link style="color: var(--accent-green);" v-else-if="item.type === 'url'" />
-                <i-ep-Tickets style="color: var(--accent-purple);" v-else-if="item.type === 'code'" />
-                <i-ep-Picture style="color: var(--accent-red);" v-else-if="item.type === 'image'" />
-                <i-ep-Document style="color: var(--accent-blue);" v-else />
+                <i-ep-Document
+                  style="color: var(--accent-blue)"
+                  v-if="item.type === 'text'"
+                />
+                <i-ep-Link
+                  style="color: var(--accent-green)"
+                  v-else-if="item.type === 'url'"
+                />
+                <i-ep-Tickets
+                  style="color: var(--accent-purple)"
+                  v-else-if="item.type === 'code'"
+                />
+                <i-ep-Picture
+                  style="color: var(--accent-red)"
+                  v-else-if="item.type === 'image'"
+                />
+                <i-ep-Document style="color: var(--accent-blue)" v-else />
               </el-icon>
             </div>
             <div class="item-content">
@@ -591,13 +617,19 @@ const exportData = () => {
               </div>
               <div class="item-meta">
                 <span class="meta-time">
-                  <i-ep-Clock class="meta-icon" /> {{ formatTime(item.timestamp) }}
+                  <i-ep-Clock class="meta-icon" />
+                  {{ formatTime(item.timestamp) }}
                 </span>
                 <span class="meta-size">
                   <i-ep-Document-Checked class="meta-icon" /> {{ item.size }}
                 </span>
                 <span class="meta-type" :class="`type-${item.type}`">
-                  <i-ep-InfoFilled class="meta-icon" /> {{ getTypeLabel(item.type) }}
+                  <i-ep-InfoFilled class="meta-icon" />
+                  {{ getTypeLabel(item.type) }}
+                </span>
+                <span v-if="item.is_favorite" class="meta-type" :class="`type-favorite`">
+                  <i-ep-Star class="meta-icon" />
+                  收藏
                 </span>
               </div>
             </div>
@@ -765,22 +797,6 @@ const exportData = () => {
   display: flex;
   align-items: center;
   gap: 3px;
-  
-  &[data-type="text"]::before {
-    background-color: rgba(52, 152, 219, 0.9);
-  }
-  
-  &[data-type="url"]::before {
-    background-color: rgba(46, 204, 113, 0.9);
-  }
-  
-  &[data-type="code"]::before {
-    background-color: rgba(155, 89, 182, 0.9);
-  }
-  
-  &[data-type="favorite"]::before {
-    background-color: rgba(231, 76, 60, 0.9);
-  }
 }
 
 .filter-tag:hover {
@@ -811,7 +827,6 @@ const exportData = () => {
   scroll-behavior: smooth;
   position: relative;
 }
-
 
 /* 空状态 */
 .empty-state {
@@ -853,23 +868,17 @@ const exportData = () => {
   display: flex;
   align-items: center;
   gap: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   /* 收藏项目特殊样式 */
   &.favorite {
-    background: var(--favorite-bg);
-    border-left: 3px solid var(--favorite-border);
-    position: relative;
-
-    &:hover {
-      border-left: 3px solid var(--favorite-border);
-    }
-
     &.active {
       border: 2px solid transparent;
-      border-left: 3px solid var(--favorite-border);
-      background-image: linear-gradient(var(--bg-active), var(--bg-active)), 
-                        linear-gradient(135deg, var(--favorite-border) 0%, var(--accent-red) 100%);
+      background-image: linear-gradient(var(--bg-active), var(--bg-active)),
+        linear-gradient(
+          135deg,
+          var(--favorite-border) 0%,
+          var(--accent-red) 100%
+        );
       background-origin: border-box;
       background-clip: padding-box, border-box;
     }
@@ -878,38 +887,18 @@ const exportData = () => {
       color: var(--favorite-border);
       fill: var(--favorite-border);
     }
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 0 20px 20px 0;
-      border-color: transparent var(--favorite-corner) transparent transparent;
-      z-index: 1;
-      border-top-right-radius: 8px;
-    }
-
-    &::after {
-      content: "★";
-      position: absolute;
-      top: 0px;
-      right: 2px;
-      font-size: 10px;
-      color: white;
-      z-index: 2;
-    }
   }
 }
 
 .content-item:hover {
   background: var(--bg-hover);
   border: 2px solid transparent;
-  background-image: linear-gradient(var(--bg-hover), var(--bg-hover)), 
-                    linear-gradient(135deg, var(--gradient-hover-start) 0%, var(--gradient-hover-end) 100%);
+  background-image: linear-gradient(var(--bg-hover), var(--bg-hover)),
+    linear-gradient(
+      135deg,
+      var(--gradient-hover-start) 0%,
+      var(--gradient-hover-end) 100%
+    );
   background-origin: border-box;
   background-clip: padding-box, border-box;
   transform: translateY(-1px);
@@ -919,8 +908,12 @@ const exportData = () => {
 .content-item.active {
   background: var(--bg-active);
   border: 2px solid transparent;
-  background-image: linear-gradient(var(--bg-active), var(--bg-active)), 
-                    linear-gradient(135deg, var(--gradient-active-start) 0%, var(--gradient-active-end) 100%);
+  background-image: linear-gradient(var(--bg-active), var(--bg-active)),
+    linear-gradient(
+      135deg,
+      var(--gradient-active-start) 0%,
+      var(--gradient-active-end) 100%
+    );
   background-origin: border-box;
   background-clip: padding-box, border-box;
   box-shadow: 0 3px 10px rgba(0, 136, 255, 0.2);
@@ -936,7 +929,8 @@ const exportData = () => {
   justify-content: center;
   font-size: 20px;
   flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .item-content {
@@ -966,44 +960,51 @@ const exportData = () => {
   font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.4;
-  
+
   .meta-icon {
     font-size: 12px;
     margin-right: 4px;
     opacity: 0.9;
     vertical-align: -2px;
   }
-  
-  .meta-time, .meta-size, .meta-type {
+
+  .meta-time,
+  .meta-size,
+  .meta-type {
     display: inline-flex;
     align-items: center;
   }
-  
+
   .meta-type {
     padding: 2px 8px;
     border-radius: 10px;
     background: rgba(0, 0, 0, 0.04);
     font-weight: 500;
     font-size: 11px;
-    
+
     &.type-text {
-      background: rgba(52, 152, 219, 0.1);
-      color: rgba(52, 152, 219, 0.9);
+      background: rgba(var(--el-color-primary-rgb), 0.1);
+      color: var(--accent-blue);
     }
-    
+
     &.type-url {
-      background: rgba(46, 204, 113, 0.1);
-      color: rgba(46, 204, 113, 0.9);
+      background: rgba(66, 184, 131, 0.1);
+      color: var(--accent-green);
     }
-    
+
     &.type-code {
-      background: rgba(155, 89, 182, 0.1);
-      color: rgba(155, 89, 182, 0.9);
+      background: rgba(139, 92, 246, 0.1);
+      color: var(--accent-purple);
     }
-    
+
     &.type-image {
-      background: rgba(231, 76, 60, 0.1);
-      color: rgba(231, 76, 60, 0.9);
+      background: rgba(255, 71, 87, 0.1);
+      color: var(--accent-red);
+    }
+
+    &.type-favorite {
+      background: rgba(240, 192, 0, 0.1);
+      color: var(--accent-yellow);
     }
   }
 }
@@ -1033,7 +1034,7 @@ const exportData = () => {
   transition: all 0.2s ease;
   color: var(--text-secondary);
   margin-left: 2px;
-  
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
     color: var(--text-primary);

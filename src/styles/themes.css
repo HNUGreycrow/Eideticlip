@@ -4,65 +4,70 @@
   --el-color-primary-rgb: 64, 158, 255;
   --el-color-primary: #0084ff;
 
-  --el-bg-color: #181818;               /* 主背景（页面/整体）*/
-  --el-bg-color-overlay: #1e1e1e;       /* 弹窗、抽屉、浮层背景 */
-  --el-bg-color-page: #181818;          /* <body> 背景 */
+  --el-bg-color: #181818; /* 主背景（页面/整体）*/
+  --el-bg-color-overlay: #1e1e1e; /* 弹窗、抽屉、浮层背景 */
+  --el-bg-color-page: #181818; /* <body> 背景 */
 
-  --el-text-color-primary: #ffffff;     /* 主文本 */
-  --el-text-color-regular: #b3b3b3;     /* 普通文本 */
-  --el-text-color-secondary: #777777;   /* 次文本/提示 */
+  --el-text-color-primary: #ffffff; /* 主文本 */
+  --el-text-color-regular: #b3b3b3; /* 普通文本 */
+  --el-text-color-secondary: #777777; /* 次文本/提示 */
 
   --el-border-color: #333333;
   --el-border-color-light: #3c3c3c;
   --el-border-color-lighter: #2c2c2c;
 
-  --el-fill-color: #252525;             /* 表单填充、列表项 hover */
+  --el-fill-color: #252525; /* 表单填充、列表项 hover */
   --el-fill-color-light: #2a2a2a;
-  --el-fill-color-blank: #181818;       /* 卡片、空白区域 */
+  --el-fill-color-blank: #181818; /* 卡片、空白区域 */
 
-  --el-mask-color: rgba(0, 0, 0, 0.8);  /* 遮罩层 */
+  --el-mask-color: rgba(0, 0, 0, 0.8); /* 遮罩层 */
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
 
   /* 自定义语义化背景变量（层级由高到低） */
-  --bg-primary:   #141414;  /* 页面背景 / 最底层容器 */
-  --bg-secondary: #1a1a1a;  /* 卡片、侧边栏、弹窗背景 */
-  --bg-tertiary:  #222222;  /* 列表项、输入框背景 */
-  --bg-hover:     #2a2a2a;  /* hover 高亮 */
-  --bg-active:    #303030;  /* 激活/按下高亮 */
+  --bg-primary: #141414; /* 页面背景 / 最底层容器 */
+  --bg-secondary: #1a1a1a; /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary: #222222; /* 列表项、输入框背景 */
+  --bg-hover: #2a2a2a; /* hover 高亮 */
+  --bg-active: #303030; /* 激活/按下高亮 */
 
   /* 文本颜色（按重要程度） */
-  --text-primary:rgba(255, 255, 255, 0.95);  /* 主文本 */
-  --text-secondary: #b8b8b8;  /* 副文本 */
-  --text-tertiary:  #808080;  /* 提示文本 */
-  --text-inverse:   #ffffff;  /* 用于深色背景上的"反色"文字 */
+  --text-primary: rgba(255, 255, 255, 0.95); /* 主文本 */
+  --text-secondary: #b8b8b8; /* 副文本 */
+  --text-tertiary: #808080; /* 提示文本 */
+  --text-inverse: #ffffff; /* 用于深色背景上的"反色"文字 */
 
   /* 边框颜色 */
-  --border-light:  #2c2c2c;
+  --border-light: #2c2c2c;
   --border-medium: #3c3c3c;
 
   /* 强调色（主题无关，两个主题保持一致） */
-  --accent-blue:   #0088ff;
+  --accent-blue: #0088ff;
   --accent-blue-hover: #0078e7; /* 按钮悬停状态 */
-  --accent-green:  #42b883;
-  --accent-red:    #ff4757;
+  --accent-green: #42b883;
+  --accent-red: #ff4757;
   --accent-purple: #8b5cf6;
   --accent-yellow: #f0c000;
-  
+
   /* 渐变色边框变量 - 深色主题 */
-  --gradient-hover-start: var(--accent-blue);
-  --gradient-hover-end: var(--accent-purple);
+  --gradient-hover-start: var(--accent-purple);
+  --gradient-hover-end: var(--accent-blue);
   --gradient-active-start: var(--accent-blue);
   --gradient-active-end: var(--accent-green);
-  
+
   /* 收藏项目颜色 */
   --favorite-bg: rgba(255, 217, 102, 0.06);
   --favorite-border: var(--accent-yellow);
   --favorite-corner: var(--accent-yellow);
 
   /* 布局尺寸 */
-  --nav-width:     60px;
+  --nav-width: 60px;
   --header-height: 50px;
-  --detail-width:  320px;
+  --detail-width: 320px;
+
+  /* 1. 只保留 3 个变量，后期换主题只改这里 */
+  --fav-dot-size: 6px; /* 指示点直径 */
+  --fav-dot-color: #f59e0b; /* 琥珀色，深浅主题都醒目 */
+  --fav-bg-hover: #fffbeb; /* 悬停时整行微亮 */
 }
 
 /* ===== 浅色主题（通过给 <html> 或 <body> 加 .light 类启用） ===== */
@@ -71,51 +76,51 @@
   --el-color-primary-rgb: 91, 147, 255;
   --el-color-primary: #0084ff;
 
-  --el-bg-color: #faf9f7;                        /* 页面背景，比纯白柔和 */
-  --el-bg-color-overlay: #f7f5f3;                /* 卡片 / 弹窗 */
+  --el-bg-color: #faf9f7; /* 页面背景，比纯白柔和 */
+  --el-bg-color-overlay: #f7f5f3; /* 卡片 / 弹窗 */
   --el-bg-color-page: #f7f5f3;
 
   --el-text-color-primary: #2e2e2e;
   --el-text-color-regular: #5c5c5c;
   --el-text-color-secondary: #8a8a8a;
-  
-  --el-border-color: #dcdfe6;
-  --el-border-color-light: #e4e7ed;
-  --el-border-color-lighter: #ebeef5;
+
+  --el-border-color: #c0c4cc;
+  --el-border-color-light: #d0d4dc;
+  --el-border-color-lighter: #e0e3ea;
 
   --el-fill-color: #f2f0ed;
   --el-fill-color-light: #f7f5f3;
-  --el-fill-color-blank: #ffffff; 
+  --el-fill-color-blank: #ffffff;
 
   --el-mask-color: rgba(0, 0, 0, 0.5);
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
 
   /* 自定义语义化背景变量 */
-  --bg-primary:   var(--el-bg-color);  /* 页面背景 */
-  --bg-secondary: var(--el-bg-color-overlay);  /* 卡片、侧边栏、弹窗背景 */
-  --bg-tertiary:  var(--el-fill-color);  /* 列表项、输入框背景 */
-  --bg-hover:   #eef5ff;  /* hover 高亮（带主题色）*/
-  --bg-active:  #e5efff;
+  --bg-primary: var(--el-bg-color); /* 页面背景 */
+  --bg-secondary: var(--el-bg-color-overlay); /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary: var(--el-fill-color); /* 列表项、输入框背景 */
+  --bg-hover: #eef5ff; /* hover 高亮（带主题色）*/
+  --bg-active: #e5efff;
 
   /* 文本颜色 */
-  --text-primary:   var(--el-text-color-primary);
+  --text-primary: var(--el-text-color-primary);
   --text-secondary: var(--el-text-color-regular);
-  --text-tertiary:  var(--el-text-color-secondary);
-  --text-inverse:   #ffffff;  /* 用于浅色背景上的"反色"文字 */
+  --text-tertiary: var(--el-text-color-secondary);
+  --text-inverse: #ffffff; /* 用于浅色背景上的"反色"文字 */
 
   /* 边框颜色 */
-  --border-light:  #dcdfe6;
-  --border-medium: #e4e7ed;
+  --border-light: #d0d4dc;
+  --border-medium: #e0e3ea;
 
   /* 强调色保持不变，但需要定义悬停状态 */
   --accent-blue-hover: #4a85f5; /* 按钮悬停状态 */
-  
+
   /* 渐变色边框变量 - 浅色主题 */
   --gradient-hover-start: #7fa9ff;
   --gradient-hover-end: #9ed8ff;
   --gradient-active-start: #a7c3ff;
   --gradient-active-end: #c3b1ff;
-  
+
   /* 收藏项目颜色 - 浅色主题专用 */
   --favorite-bg: rgba(255, 217, 102, 0.06);
   --favorite-border: var(--accent-yellow);
@@ -148,34 +153,34 @@
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
 
   /* 自定义语义化背景变量 */
-  --bg-primary:   #fde8f0;  /* 页面背景 */
-  --bg-secondary: #feeef3;  /* 卡片、侧边栏、弹窗背景 */
-  --bg-tertiary:  #fef2f6;  /* 列表项、输入框背景 */
-  --bg-hover:     #ffe4ee;  /* hover 高亮（带主题色）*/
-  --bg-active:    #ffd1e1;
+  --bg-primary: #fde8f0; /* 页面背景 */
+  --bg-secondary: #feeef3; /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary: #fef2f6; /* 列表项、输入框背景 */
+  --bg-hover: #ffe4ee; /* hover 高亮（带主题色）*/
+  --bg-active: #ffd1e1;
 
   /* 文本颜色 */
-  --text-primary:   #4a2b3a;
+  --text-primary: #4a2b3a;
   --text-secondary: #6d4e5c;
-  --text-tertiary:  #8e6b7a;
-  --text-inverse:   #ffffff;
-  
+  --text-tertiary: #8e6b7a;
+  --text-inverse: #ffffff;
+
   /* 收藏项目颜色 - 粉色主题专用 */
   --favorite-bg: rgba(255, 155, 205, 0.1);
   --favorite-border: #ff9bcd;
   --favorite-corner: #ff9bcd;
 
   /* 边框颜色 */
-  --border-light:  #ffd1e1;
+  --border-light: #ffd1e1;
   --border-medium: #ffb6c9;
 
   /* 强调色 */
-  --accent-blue:   #ff69b4;
+  --accent-blue: #ff69b4;
   --accent-blue-hover: #e05a9e; /* 按钮悬停状态 */
-  --accent-green:  #ff85a2;
-  --accent-red:    #ff4757;
+  --accent-green: #ff85a2;
+  --accent-red: #ff4757;
   --accent-purple: #da70d6;
-  
+
   /* 渐变色边框变量 - 粉色主题 */
   --gradient-hover-start: #ff9a9e;
   --gradient-hover-end: #fecfef;
@@ -209,34 +214,35 @@
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.05);
 
   /* 自定义语义化背景变量 */
-  --bg-primary:   #fffaf0;  /* 页面背景 */
-  --bg-secondary: #fff5e6;  /* 卡片、侧边栏、弹窗背景 */
-  --bg-tertiary:  #fff0dc;  /* 列表项、输入框背景 */
-  --bg-hover:     #ffe8cc;  /* hover 高亮（带主题色）*/
-  --bg-active:    #ffd9a8;
+  --bg-primary: #fffaf0; /* 页面背景 */
+  --bg-secondary: #fff5e6; /* 卡片、侧边栏、弹窗背景 */
+  --bg-tertiary: #fff0dc; /* 列表项、输入框背景 */
+  --bg-hover: #ffe8cc; /* hover 高亮（带主题色）*/
+  --bg-active: #ffd9a8;
 
   /* 文本颜色 */
-  --text-primary:   #4a3520;
+  --text-primary: #4a3520;
   --text-secondary: #6d5a40;
-  --text-tertiary:  #8e7a60;
-  --text-inverse:   #ffffff;
-  
+  --text-tertiary: #8e7a60;
+  --text-inverse: #ffffff;
+
   /* 收藏项目颜色 - 橙色主题专用 */
   --favorite-bg: rgba(255, 160, 0, 0.1);
   --favorite-border: #ffa000;
   --favorite-corner: #ffa000;
 
   /* 边框颜色 */
-  --border-light:  #ffd9a8;
+  --border-light: #ffd9a8;
   --border-medium: #ffcc80;
 
   /* 强调色 */
-  --accent-blue:   #ff8c00;
+  --accent-blue: #ff8c00;
   --accent-blue-hover: #e67e00; /* 按钮悬停状态 */
-  --accent-green:  #ffa726;
-  --accent-red:    #ff5722;
+  --accent-green: #ffa726;
+  --accent-red: #ff5722;
   --accent-purple: #e65100;
-  
+  --accent-yellow: #ff8a65;
+
   /* 渐变色边框变量 - 橙色主题 */
   --gradient-hover-start: #ffb74d;
   --gradient-hover-end: #ff8a65;
