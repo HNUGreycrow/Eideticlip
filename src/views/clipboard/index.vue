@@ -1008,27 +1008,27 @@ const exportData = () => {
     font-size: 11px;
 
     &.type-text {
-      background: rgba(var(--el-color-primary-rgb), 0.1);
+      background: var(--type-text-bg);
       color: var(--accent-blue);
     }
 
     &.type-url {
-      background: rgba(66, 184, 131, 0.1);
+      background: var(--type-url-bg);
       color: var(--accent-green);
     }
 
     &.type-code {
-      background: rgba(139, 92, 246, 0.1);
+      background: var(--type-code-bg);
       color: var(--accent-purple);
     }
 
     &.type-image {
-      background: rgba(255, 71, 87, 0.1);
+      background: var(--type-image-bg);
       color: var(--accent-red);
     }
 
     &.type-favorite {
-      background: rgba(240, 192, 0, 0.1);
+      background: var(--type-favorite-bg);
       color: var(--accent-yellow);
     }
   }

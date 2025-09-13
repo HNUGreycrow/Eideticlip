@@ -41,23 +41,38 @@
   --border-medium: #3c3c3c;
 
   /* 强调色（主题无关，两个主题保持一致） */
-  --accent-blue: #0088ff;
-  --accent-blue-hover: #0078e7; /* 按钮悬停状态 */
-  --accent-green: #42b883;
-  --accent-red: #ff4757;
-  --accent-purple: #8b5cf6;
-  --accent-yellow: #f0c000;
+  --accent-primary: #0088ff; /* 主强调色（蓝色） */
+  --accent-primary-hover: #0078e7; /* 按钮悬停状态 */
+  --accent-secondary: #42b883; /* 次强调色（绿色） */
+  --accent-danger: #ff4757; /* 危险色（红色） */
+  --accent-tertiary: #8b5cf6; /* 第三强调色（紫色） */
+  --accent-quaternary: #f0c000; /* 第四强调色（黄色） */
+  
+  /* 兼容性变量（保持与其他主题一致的变量名） */
+  --accent-blue: var(--accent-primary);
+  --accent-blue-hover: var(--accent-primary-hover);
+  --accent-green: var(--accent-secondary);
+  --accent-red: var(--accent-danger);
+  --accent-purple: var(--accent-tertiary);
+  --accent-yellow: var(--accent-quaternary);
 
   /* 渐变色边框变量 - 深色主题 */
-  --gradient-hover-start: var(--accent-purple);
-  --gradient-hover-end: var(--accent-blue);
-  --gradient-active-start: var(--accent-blue);
-  --gradient-active-end: var(--accent-green);
+  --gradient-hover-start: var(--accent-tertiary);
+  --gradient-hover-end: var(--accent-primary);
+  --gradient-active-start: var(--accent-primary);
+  --gradient-active-end: var(--accent-secondary);
 
   /* 收藏项目颜色 */
   --favorite-bg: rgba(255, 217, 102, 0.06);
-  --favorite-border: var(--accent-yellow);
-  --favorite-corner: var(--accent-yellow);
+  --favorite-border: var(--accent-quaternary);
+  --favorite-corner: var(--accent-quaternary);
+
+  /* 剪贴板项目类型背景色 */
+  --type-text-bg: rgba(var(--el-color-primary-rgb), 0.1);
+  --type-url-bg: rgba(66, 184, 131, 0.1);
+  --type-code-bg: rgba(139, 92, 246, 0.1);
+  --type-image-bg: rgba(255, 71, 87, 0.1);
+  --type-favorite-bg: rgba(240, 192, 0, 0.1);
 
   /* 布局尺寸 */
   --nav-width: 60px;
@@ -113,18 +128,28 @@
   --border-medium: #e0e3ea;
 
   /* 强调色保持不变，但需要定义悬停状态 */
-  --accent-blue-hover: #4a85f5; /* 按钮悬停状态 */
+  --accent-primary-hover: #4a85f5; /* 按钮悬停状态 */
+  
+  /* 兼容性变量（保持与其他主题一致的变量名） */
+  --accent-blue-hover: var(--accent-primary-hover);
 
   /* 渐变色边框变量 - 浅色主题 */
-  --gradient-hover-start: #7fa9ff;
-  --gradient-hover-end: #9ed8ff;
-  --gradient-active-start: #a7c3ff;
-  --gradient-active-end: #c3b1ff;
+  --gradient-hover-start: var(--accent-primary);
+  --gradient-hover-end: var(--accent-secondary);
+  --gradient-active-start: var(--accent-primary-hover);
+  --gradient-active-end: var(--accent-tertiary);
 
   /* 收藏项目颜色 - 浅色主题专用 */
   --favorite-bg: rgba(255, 217, 102, 0.06);
-  --favorite-border: var(--accent-yellow);
-  --favorite-corner: var(--accent-yellow);
+  --favorite-border: var(--accent-quaternary);
+  --favorite-corner: var(--accent-quaternary);
+
+  /* 剪贴板项目类型背景色 - 浅色主题 */
+  --type-text-bg: rgba(0, 132, 255, 0.15);
+  --type-url-bg: rgba(66, 184, 131, 0.15);
+  --type-code-bg: rgba(139, 92, 246, 0.15);
+  --type-image-bg: rgba(255, 71, 87, 0.15);
+  --type-favorite-bg: rgba(240, 192, 0, 0.15);
 }
 
 /* ===== 粉色主题 ===== */
@@ -170,22 +195,37 @@
   --favorite-border: #ff9bcd;
   --favorite-corner: #ff9bcd;
 
+  /* 剪贴板项目类型背景色 - 粉色主题 */
+  --type-text-bg: rgba(255, 105, 180, 0.15);
+  --type-url-bg: rgba(255, 133, 162, 0.15);
+  --type-code-bg: rgba(218, 112, 214, 0.15);
+  --type-image-bg: rgba(255, 71, 87, 0.15);
+  --type-favorite-bg: rgba(255, 155, 205, 0.15);
+
   /* 边框颜色 */
   --border-light: #ffd1e1;
   --border-medium: #ffb6c9;
 
   /* 强调色 */
-  --accent-blue: #ff69b4;
-  --accent-blue-hover: #e05a9e; /* 按钮悬停状态 */
-  --accent-green: #ff85a2;
-  --accent-red: #ff4757;
-  --accent-purple: #da70d6;
+  --accent-primary: #ff69b4; /* 主强调色（粉色） */
+  --accent-primary-hover: #e05a9e; /* 按钮悬停状态 */
+  --accent-secondary: #ff85a2; /* 次强调色（浅粉色） */
+  --accent-danger: #ff4757; /* 危险色（红色） */
+  --accent-tertiary: #da70d6; /* 第三强调色（紫色） */
+  
+  /* 兼容性变量（保持与其他主题一致的变量名） */
+  --accent-blue: var(--accent-primary);
+  --accent-blue-hover: var(--accent-primary-hover);
+  --accent-green: var(--accent-secondary);
+  --accent-red: var(--accent-danger);
+  --accent-purple: var(--accent-tertiary);
+  --accent-yellow: #ff8a65;
 
   /* 渐变色边框变量 - 粉色主题 */
   --gradient-hover-start: #ff9a9e;
   --gradient-hover-end: #fecfef;
-  --gradient-active-start: #ff69b4;
-  --gradient-active-end: #da70d6;
+  --gradient-active-start: var(--accent-primary);
+  --gradient-active-end: var(--accent-tertiary);
 }
 
 /* ===== 橙色主题 ===== */
@@ -231,21 +271,36 @@
   --favorite-border: #ffa000;
   --favorite-corner: #ffa000;
 
+  /* 剪贴板项目类型背景色 - 橙色主题 */
+  --type-text-bg: rgba(255, 140, 0, 0.15);
+  --type-url-bg: rgba(255, 167, 38, 0.15);
+  --type-code-bg: rgba(230, 81, 0, 0.15);
+  --type-image-bg: rgba(255, 87, 34, 0.15);
+  --type-favorite-bg: rgba(255, 138, 101, 0.15);
+
   /* 边框颜色 */
   --border-light: #ffd9a8;
   --border-medium: #ffcc80;
 
   /* 强调色 */
-  --accent-blue: #ff8c00;
-  --accent-blue-hover: #e67e00; /* 按钮悬停状态 */
-  --accent-green: #ffa726;
-  --accent-red: #ff5722;
-  --accent-purple: #e65100;
-  --accent-yellow: #ff8a65;
+  --accent-primary: #ff8c00; /* 主强调色（橙色） */
+  --accent-primary-hover: #e67e00; /* 按钮悬停状态 */
+  --accent-secondary: #ffa726; /* 次强调色（浅橙色） */
+  --accent-danger: #ff5722; /* 危险色（红橙色） */
+  --accent-tertiary: #e65100; /* 第三强调色（深橙色） */
+  --accent-quaternary: #ff8a65; /* 第四强调色（珊瑚色） */
+  
+  /* 兼容性变量（保持与其他主题一致的变量名） */
+  --accent-blue: var(--accent-primary);
+  --accent-blue-hover: var(--accent-primary-hover);
+  --accent-green: var(--accent-secondary);
+  --accent-red: var(--accent-danger);
+  --accent-purple: var(--accent-tertiary);
+  --accent-yellow: var(--accent-quaternary);
 
   /* 渐变色边框变量 - 橙色主题 */
   --gradient-hover-start: #ffb74d;
-  --gradient-hover-end: #ff8a65;
-  --gradient-active-start: #ff8c00;
-  --gradient-active-end: #ff5722;
+  --gradient-hover-end: var(--accent-quaternary);
+  --gradient-active-start: var(--accent-primary);
+  --gradient-active-end: var(--accent-danger);
 }
