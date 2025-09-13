@@ -33,7 +33,6 @@ declare module 'vue' {
     IEpCheck: typeof import('~icons/ep/check')['default']
     IEpClock: typeof import('~icons/ep/clock')['default']
     IEpClose: typeof import('~icons/ep/close')['default']
-    IEpCrop: typeof import('~icons/ep/crop')['default']
     IEpDelete: typeof import('~icons/ep/delete')['default']
     IEpDocument: typeof import('~icons/ep/document')['default']
     IEpDocumentChecked: typeof import('~icons/ep/document-checked')['default']

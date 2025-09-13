@@ -82,6 +82,15 @@ export class WindowService {
       this.win?.show();
     });
 
+    // 监听窗口最大化状态变化
+    this.win.on("maximize", () => {
+      this.win?.webContents.send("window-maximize-changed", true);
+    });
+
+    this.win.on("unmaximize", () => {
+      this.win?.webContents.send("window-maximize-changed", false);
+    });
+
     return this.win;
   }
 
@@ -106,6 +115,11 @@ export class WindowService {
       } else {
         this.win?.maximize();
       }
+    });
+
+    // 获取窗口最大化状态
+    ipcMain.handle("window-is-maximized", () => {
+      return this.win?.isMaximized() || false;
     });
 
     // 关闭窗口

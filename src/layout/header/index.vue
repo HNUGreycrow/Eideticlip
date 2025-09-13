@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+import MaximizeIcon from '@/assets/window-maximize.svg'
+import RestoreIcon from '@/assets/window-restore.svg'
+
+const isMaximized = ref(false)
+let unsubscribe: (() => void) | null = null
 
 const handleMinimize = () => {
   window.windowControls.minimize();
@@ -23,6 +29,28 @@ const handleClose = () => {
     // 取消关闭
   });
 }
+
+onMounted(async () => {
+  // 获取初始状态
+  try {
+    isMaximized.value = await window.windowControls.isMaximized()
+  } catch (error) {
+    console.error('获取窗口状态失败:', error)
+  }
+  
+  // 监听状态变化
+  if (window.windowControls.onMaximizeChange) {
+    unsubscribe = window.windowControls.onMaximizeChange((maximized: boolean) => {
+      isMaximized.value = maximized
+    })
+  }
+})
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe()
+  }
+})
 </script>
 
 <template>
@@ -38,8 +66,13 @@ const handleClose = () => {
       </el-button>
 
       <!-- 最大化/还原按钮 -->
-      <el-button class="titlebar-btn maximize-btn" aria-label="最大化窗口" @click="handleMaximize">
-        <template #icon> <i-ep-crop /></template>
+      <el-button 
+        class="titlebar-btn maximize-btn" 
+        @click="handleMaximize"
+      >
+        <template #icon>
+          <component style="font-size: 13px;" :is="isMaximized ? RestoreIcon : MaximizeIcon" />
+        </template>
       </el-button>
 
       <!-- 关闭按钮 -->
@@ -119,16 +152,8 @@ const handleClose = () => {
   }
 }
 
-// 最小化按钮
-.minimize-btn:hover {
-  background-color: var(--bg-hover);
-  
-  :deep(.el-icon) {
-    color: var(--text-primary);
-  }
-}
-
-// 最大化按钮
+// 最小化按钮，最大化按钮
+.minimize-btn:hover,
 .maximize-btn:hover {
   background-color: var(--bg-hover);
   
@@ -172,6 +197,5 @@ const handleClose = () => {
   font-weight: 500;
   color: var(--text-primary);
   letter-spacing: 0.3px;
-  
 }
 </style>

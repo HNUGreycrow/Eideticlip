@@ -2,7 +2,8 @@ export interface WindowControls {
   minimize: () => void;
   maximize: () => void;
   close: () => void;
-  onStatusChange: (callback: (status: { maximized: boolean }) => void) => void;
+  isMaximized: () => Promise<boolean>;
+  onMaximizeChange: (callback: (isMaximized: boolean) => void) => () => void;
 }
 
 // 剪贴板项目类型定义

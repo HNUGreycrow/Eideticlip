@@ -28,7 +28,8 @@ interface Window {
     minimize: () => void
     maximize: () => void
     close: () => void
-    onStatusChange: (callback: (status: { maximized: boolean }) => void) => void
+    isMaximized: () => Promise<boolean>
+    onMaximizeChange: (callback: (isMaximized: boolean) => void) => () => void
   }
   clipboard: {
     setFavorite: (id: number, isFavorite: boolean) => Promise<boolean>

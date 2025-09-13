@@ -32,6 +32,12 @@ contextBridge.exposeInMainWorld('windowControls', {
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
   close: () => ipcRenderer.send('window-close'),
+  isMaximized: () => ipcRenderer.invoke('window-is-maximized'),
+  onMaximizeChange: (callback: (isMaximized: boolean) => void) => {
+    const wrappedCallback = (_: any, isMaximized: boolean) => callback(isMaximized);
+    ipcRenderer.on('window-maximize-changed', wrappedCallback);
+    return () => ipcRenderer.removeListener('window-maximize-changed', wrappedCallback);
+  }
 } as WindowControls)
 
 // 剪切板 API
