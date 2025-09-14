@@ -50,6 +50,7 @@ onMounted(async () => {
       updateDownloaded.value = true;
     } else if (status.status === 'error') {
       isDownloading.value = false;
+      ElMessage.error('更新检查失败: ' + status.data);
     }
   });
   

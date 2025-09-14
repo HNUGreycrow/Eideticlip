@@ -83,15 +83,20 @@ export function closeDatabase() {
 export function saveClipboardItem(item: any) {
   try {
     // 将Date对象转换为ISO字符串
-    const timestamp = item.timestamp instanceof Date ? item.timestamp.toISOString() : item.timestamp;
+    const timestamp =
+      item.timestamp instanceof Date
+        ? item.timestamp.toISOString()
+        : item.timestamp;
     const isFavorite = item.is_favorite ? 1 : 0;
-    
+
     const insertQuery = `
       INSERT INTO clipboard_items (content, type, timestamp, size, is_favorite)
       VALUES (?, ?, ?, ?, ?)
-    `
-    const result = db.prepare(insertQuery).run(item.content, item.type, timestamp, item.size, isFavorite);
-    
+    `;
+    const result = db
+      .prepare(insertQuery)
+      .run(item.content, item.type, timestamp, item.size, isFavorite);
+
     // 返回插入的记录ID
     return result.lastInsertRowid;
   } catch (error) {
@@ -109,12 +114,66 @@ export function deleteClipboardItem(id: string) {
   try {
     const deleteQuery = `
       DELETE FROM clipboard_items WHERE id = ?
-    `
+    `;
     db.prepare(deleteQuery).run(id);
     return true;
   } catch (error) {
     console.error("Failed to delete clipboard item:", error);
     return false;
+  }
+}
+
+/**
+ * 批量删除剪贴板项目
+ * @param ids 项目ID数组
+ * @returns 删除结果对象，包含成功数量和失败的ID列表
+ */
+export function deleteBatchClipboardItems(ids: string[]) {
+  if (!ids || ids.length === 0) {
+    return { success: true, deletedCount: 0, failedIds: [] };
+  }
+
+  try {
+    // 使用事务确保批量操作的原子性
+    const transaction = db.transaction((itemIds: string[]) => {
+      const deleteQuery = db.prepare(
+        "DELETE FROM clipboard_items WHERE id = ?"
+      );
+      const results = [];
+
+      for (const id of itemIds) {
+        try {
+          const result = deleteQuery.run(id);
+          results.push({ id, success: result.changes > 0 });
+        } catch (error) {
+          console.error(`Failed to delete clipboard item ${id}:`, error);
+          results.push({ id, success: false });
+        }
+      }
+
+      return results;
+    });
+
+    const results = transaction(ids);
+    const failedIds = results
+      .filter((r: { success: any }) => !r.success)
+      .map((r: { id: any }) => r.id);
+    const deletedCount = results.filter(
+      (r: { success: any }) => r.success
+    ).length;
+
+    return {
+      success: failedIds.length === 0,
+      deletedCount,
+      failedIds,
+    };
+  } catch (error) {
+    console.error("Failed to batch delete clipboard items:", error);
+    return {
+      success: false,
+      deletedCount: 0,
+      failedIds: ids,
+    };
   }
 }
 
@@ -126,11 +185,13 @@ export function clearClipboardHistory() {
   try {
     db.transaction(() => {
       db.prepare(`DELETE FROM clipboard_items`).run();
-      db.prepare(`DELETE FROM sqlite_sequence WHERE name='clipboard_items'`).run();
+      db.prepare(
+        `DELETE FROM sqlite_sequence WHERE name='clipboard_items'`
+      ).run();
     })();
     return true;
   } catch (err) {
-    console.error('Failed to clear clipboard history:', err);
+    console.error("Failed to clear clipboard history:", err);
     return false;
   }
 }
@@ -146,35 +207,41 @@ export function clearExpiredClipboardItems(retentionDays: number) {
     const expiredDate = new Date();
     expiredDate.setDate(expiredDate.getDate() - retentionDays);
     const expiredTimestamp = expiredDate.toISOString();
-    
+
     console.log(`清除 ${expiredTimestamp} 之前的非收藏记录`);
-    
+
     // 删除过期且非收藏的记录
     const deleteQuery = `
       DELETE FROM clipboard_items 
       WHERE timestamp < ? AND is_favorite = 0
     `;
     const result = db.prepare(deleteQuery).run(expiredTimestamp);
-    
+
     // 如果删除了记录，重新整理ID序列
     if (result.changes > 0) {
       // 获取当前最大ID
-      const maxIdResult = db.prepare('SELECT MAX(id) as maxId FROM clipboard_items').get();
+      const maxIdResult = db
+        .prepare("SELECT MAX(id) as maxId FROM clipboard_items")
+        .get();
       const maxId = maxIdResult?.maxId || 0;
-      
+
       // 重置自增序列
       if (maxId > 0) {
-        db.prepare(`UPDATE sqlite_sequence SET seq = ? WHERE name = 'clipboard_items'`).run(maxId);
+        db.prepare(
+          `UPDATE sqlite_sequence SET seq = ? WHERE name = 'clipboard_items'`
+        ).run(maxId);
       } else {
         // 如果没有记录了，删除序列记录
-        db.prepare(`DELETE FROM sqlite_sequence WHERE name = 'clipboard_items'`).run();
+        db.prepare(
+          `DELETE FROM sqlite_sequence WHERE name = 'clipboard_items'`
+        ).run();
       }
     }
-    
+
     console.log(`已清除 ${result.changes} 条过期记录`);
     return result.changes;
   } catch (error) {
-    console.error('Failed to clear expired clipboard items:', error);
+    console.error("Failed to clear expired clipboard items:", error);
     return 0;
   }
 }
@@ -207,12 +274,12 @@ export function getClipboardHistory(page = 1, pageSize = 50, type = "all") {
   try {
     // 计算偏移量
     const offset = (page - 1) * pageSize;
-    
+
     // 根据是否有类型筛选构建不同的查询
     let selectQuery, countQuery;
     let params = [];
-    
-    if (type && type !== 'all' && type !== 'favorite') {
+
+    if (type && type !== "all" && type !== "favorite") {
       // 按类型筛选
       selectQuery = `
         SELECT * FROM clipboard_items 
@@ -224,7 +291,7 @@ export function getClipboardHistory(page = 1, pageSize = 50, type = "all") {
         WHERE type = ?
       `;
       params = [type, pageSize, offset];
-    } else if (type === 'favorite') {
+    } else if (type === "favorite") {
       // 收藏筛选
       selectQuery = `
         SELECT * FROM clipboard_items 
@@ -247,26 +314,26 @@ export function getClipboardHistory(page = 1, pageSize = 50, type = "all") {
       `;
       params = [pageSize, offset];
     }
-    
+
     // 获取总数
     let totalResult;
-    if (type && type !== 'all' && type !== 'favorite') {
+    if (type && type !== "all" && type !== "favorite") {
       totalResult = db.prepare(countQuery).get(type);
-    } else if (type === 'favorite') {
+    } else if (type === "favorite") {
       totalResult = db.prepare(countQuery).get();
     } else {
       totalResult = db.prepare(countQuery).get();
     }
     const total = totalResult ? totalResult.total : 0;
-    
+
     // 获取分页数据
     const items = db.prepare(selectQuery).all(...params);
-    
+
     return {
       items,
       total,
       page,
-      pageSize
+      pageSize,
     };
   } catch (error) {
     console.error("Failed to get clipboard history:", error);
@@ -284,7 +351,7 @@ export function setFavoriteStatus(id: string, isFavorite: boolean) {
   try {
     const updateQuery = `
       UPDATE clipboard_items SET is_favorite = ? WHERE id = ?
-    `
+    `;
     db.prepare(updateQuery).run(isFavorite ? 1 : 0, id);
     return true;
   } catch (error) {
@@ -301,7 +368,7 @@ export function getFavoriteClipboardItems() {
   try {
     const selectQuery = `
       SELECT * FROM clipboard_items WHERE is_favorite = 1 ORDER BY id DESC
-    `
+    `;
     const rows = db.prepare(selectQuery).all();
     return rows;
   } catch (error) {

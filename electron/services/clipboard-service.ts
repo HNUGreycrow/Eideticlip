@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import {
   saveClipboardItem,
   deleteClipboardItem,
+  deleteBatchClipboardItems,
   clearClipboardHistory,
   getClipboardHistory,
   setFavoriteStatus,
@@ -70,6 +71,11 @@ export class ClipboardService {
     // 删除剪贴板历史项目
     ipcMain.handle("clipboard-delete-item", (_, id) => {
       return deleteClipboardItem(id);
+    });
+
+    // 批量删除剪贴板历史项目
+    ipcMain.handle("clipboard-delete-batch", (_, ids) => {
+      return deleteBatchClipboardItems(ids);
     });
 
     // 清空剪贴板历史

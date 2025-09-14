@@ -25,6 +25,10 @@ let clipboardWatcherCleanup: (() => void) | null = null; // 剪贴板监听清�
 // 剪贴板数据
 const clipboardData = ref<ClipboardItem[]>([]);
 
+// 批量选择相关状态
+const selectedIds = ref<Set<number>>(new Set());
+const isSelectionMode = ref(false);
+
 // 监听类型过滤器变化，重新加载数据
 watch(activeFilter, (newType) => {
   // 切换类型时，重置页码并重新加载数据
@@ -70,6 +74,33 @@ const getClipboardData = computed(() => {
     return lowerContent.indexOf(query) !== -1;
   });
 });
+
+/**
+ * 计算是否全选
+ */
+const isAllSelected = computed(() => {
+  const currentData = getClipboardData.value;
+  return (
+    currentData.length > 0 &&
+    currentData.every((item) => selectedIds.value.has(item.id))
+  );
+});
+
+/**
+ * 计算是否部分选中
+ */
+const isIndeterminate = computed(() => {
+  const currentData = getClipboardData.value;
+  const selectedCount = currentData.filter((item) =>
+    selectedIds.value.has(item.id)
+  ).length;
+  return selectedCount > 0 && selectedCount < currentData.length;
+});
+
+/**
+ * 计算选中的项目数量
+ */
+const selectedCount = computed(() => selectedIds.value.size);
 
 const isOpen = ref(false);
 /**
@@ -165,17 +196,17 @@ const deleteItem = (itemOrId: ClipboardItem | number, event?: Event) => {
   const id = typeof itemOrId === "number" ? itemOrId : itemOrId.id;
 
   // 先在本地移除对应项
-  const index = clipboardData.value.findIndex(item => item.id === id);
+  const index = clipboardData.value.findIndex((item) => item.id === id);
   if (index !== -1) {
     clipboardData.value.splice(index, 1);
     // 更新总数
     totalItems.value -= 1;
-    
+
     // 如果当前选中的是被删除的项目，则清空选中
     if (selectedItem.value?.id === id) {
       selectedItem.value = null;
     }
-    
+
     ElMessage({
       message: "删除成功",
       type: "success",
@@ -266,8 +297,9 @@ const addClipboardItem = async (content: string) => {
   const type = getContentType(content);
 
   // 检查当前筛选类型，如果不是"all"且类型不匹配，则不添加到当前视图
-  const shouldAddToCurrentView = activeFilter.value === "all" || 
-    activeFilter.value === type || 
+  const shouldAddToCurrentView =
+    activeFilter.value === "all" ||
+    activeFilter.value === type ||
     (activeFilter.value === "favorite" && false); // 收藏类型需要单独处理
 
   // 计算大小
@@ -292,7 +324,7 @@ const addClipboardItem = async (content: string) => {
       } else {
         console.error("保存项目时返回的ID无效");
       }
-      
+
       // 只有当类型匹配当前筛选条件时，才添加到当前视图
       if (shouldAddToCurrentView) {
         // 使用返回的项目id
@@ -501,6 +533,115 @@ const exportData = () => {
   URL.revokeObjectURL(url);
   // 这里可以添加导出成功的提示
 };
+
+/**
+ * 切换选择模式
+ */
+const toggleSelectionMode = () => {
+  isSelectionMode.value = !isSelectionMode.value;
+  if (!isSelectionMode.value) {
+    selectedIds.value.clear();
+  }
+};
+
+/**
+ * 切换单个项目的选中状态
+ */
+const toggleItemSelection = (itemId: number) => {
+  if (selectedIds.value.has(itemId)) {
+    selectedIds.value.delete(itemId);
+  } else {
+    selectedIds.value.add(itemId);
+  }
+};
+
+/**
+ * 全选/取消全选
+ */
+const toggleSelectAll = () => {
+  const currentData = getClipboardData.value;
+  if (isAllSelected.value) {
+    // 取消全选
+    currentData.forEach((item) => selectedIds.value.delete(item.id));
+  } else {
+    // 全选
+    currentData.forEach((item) => selectedIds.value.add(item.id));
+  }
+};
+
+/**
+ * 批量删除选中的项目
+ */
+const deleteBatchItems = () => {
+  if (selectedIds.value.size === 0) {
+    ElMessage({
+      message: "请先选择要删除的项目",
+      type: "warning",
+    });
+    return;
+  }
+
+  ElMessageBox.confirm(
+    `确定要删除选中的 ${selectedIds.value.size} 个项目吗？`,
+    "批量删除确认",
+    {
+      confirmButtonText: "确认删除",
+      cancelButtonText: "取消",
+      type: "warning",
+    }
+  ).then(() => {
+    const idsToDelete = Array.from(selectedIds.value);
+
+    // 先从本地数据中移除
+    const deletedItems = [];
+    for (let i = clipboardData.value.length - 1; i >= 0; i--) {
+      const item = clipboardData.value[i];
+      if (selectedIds.value.has(item.id)) {
+        deletedItems.push(clipboardData.value.splice(i, 1)[0]);
+      }
+    }
+
+    // 更新总数
+    totalItems.value -= deletedItems.length;
+
+    // 清空选中状态
+    selectedIds.value.clear();
+
+    // 如果当前选中的项目被删除，清空选中
+    if (selectedItem.value && idsToDelete.includes(selectedItem.value.id)) {
+      selectedItem.value = null;
+    }
+
+    ElMessage({
+      message: `已删除 ${deletedItems.length} 个项目`,
+      type: "success",
+    });
+
+    // 调用后端批量删除
+    window.clipboard
+      .deleteBatch(idsToDelete)
+      .then((result) => {
+        if (!result.success && result.failedIds.length > 0) {
+          console.error("部分项目删除失败:", result.failedIds);
+          // 如果有删除失败的项目，重新加载数据以保持一致性
+          loadClipboardHistory();
+          ElMessage({
+            message: `${result.failedIds.length} 个项目删除失败，已重新加载数据`,
+            type: "warning",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("批量删除出错:", error);
+        // 发生错误时重新加载数据以保持一致性
+        loadClipboardHistory();
+        ElMessage({
+          message: "删除失败，已重新加载数据",
+          type: "error",
+        });
+      });
+  });
+};
 </script>
 
 <template>
@@ -529,16 +670,46 @@ const exportData = () => {
               inline-prompt
             />
           </el-tooltip>
-          <el-button class="action-btn" @click="clearAll">
-            <i-ep-delete style="margin-right: 3px" /> 清空
-          </el-button>
-          <el-button
-            type="primary"
-            class="action-btn primary"
-            @click="exportData"
-          >
-            <i-ep-upload style="margin-right: 3px" /> 导出
-          </el-button>
+
+          <!-- 批量操作区域 -->
+          <template v-if="isSelectionMode">
+            <div class="batch-actions">
+              <el-checkbox
+                :model-value="isAllSelected"
+                :indeterminate="isIndeterminate"
+                @change="toggleSelectAll"
+              >
+                全选 ({{ selectedCount }})
+              </el-checkbox>
+              <el-button
+                class="action-btn"
+                :disabled="selectedCount === 0"
+                @click="deleteBatchItems"
+              >
+                <i-ep-delete style="margin-right: 3px" /> 删除选中 ({{
+                  selectedCount
+                }})
+              </el-button>
+              <el-button class="action-btn" @click="toggleSelectionMode">
+                取消
+              </el-button>
+            </div>
+          </template>
+          <template v-else>
+            <el-button class="action-btn" @click="toggleSelectionMode">
+              <i-ep-select style="margin-right: 3px" /> 批量选择
+            </el-button>
+            <el-button class="action-btn" @click="clearAll">
+              <i-ep-delete style="margin-right: 3px" /> 清空
+            </el-button>
+            <el-button
+              type="primary"
+              class="action-btn primary"
+              @click="exportData"
+            >
+              <i-ep-upload style="margin-right: 3px" /> 导出
+            </el-button>
+          </template>
         </div>
       </div>
 
@@ -609,12 +780,23 @@ const exportData = () => {
             :class="{
               active: selectedItem?.id === item.id,
               favorite: item.is_favorite,
+              selected: selectedIds.has(item.id),
             }"
             @click="
-              copyItem(item, $event);
-              selectedItem = item;
+              isSelectionMode
+                ? toggleItemSelection(item.id)
+                : (copyItem(item, $event), (selectedItem = item))
             "
           >
+            <!-- 批量选择复选框 -->
+            <div v-if="isSelectionMode" class="item-checkbox">
+              <el-checkbox
+                :model-value="selectedIds.has(item.id)"
+                @change="toggleItemSelection(item.id)"
+                @click.stop
+              />
+            </div>
+
             <div class="item-icon">
               <el-icon>
                 <i-ep-Document
@@ -652,7 +834,11 @@ const exportData = () => {
                   <i-ep-InfoFilled class="meta-icon" />
                   {{ getTypeLabel(item.type) }}
                 </span>
-                <span v-if="item.is_favorite" class="meta-type" :class="`type-favorite`">
+                <span
+                  v-if="item.is_favorite"
+                  class="meta-type"
+                  :class="`type-favorite`"
+                >
                   <i-ep-Star class="meta-icon" />
                   收藏
                 </span>
@@ -760,6 +946,15 @@ const exportData = () => {
 .header-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
 }
 
 .action-btn {
@@ -771,6 +966,11 @@ const exportData = () => {
 
   &.primary {
     color: var(--text-inverse);
+  }
+
+  &:disabled {
+    color: var(--text-tertiary);
+    border-color: var(--border-light);
   }
 }
 
@@ -894,6 +1094,35 @@ const exportData = () => {
   align-items: center;
   gap: 14px;
 
+  &:hover {
+    background: var(--bg-hover);
+    border: 2px solid inherit;
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.active {
+    background: var(--bg-active);
+    border: 2px solid transparent;
+    background-image: linear-gradient(var(--bg-hover), var(--bg-hover)),
+      linear-gradient(
+        135deg,
+        var(--gradient-hover-start) 0%,
+        var(--gradient-hover-end) 100%
+      );
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 3px 10px rgba(0, 136, 255, 0.2);
+  }
+
+  /* 选中状态样式 */
+  &.selected {
+    background: var(--bg-active);
+    box-shadow: 0 2px 8px rgba(0, 136, 255, 0.15);
+  }
+
   /* 收藏项目特殊样式 */
   &.favorite {
     &.active {
@@ -915,35 +1144,6 @@ const exportData = () => {
   }
 }
 
-.content-item:hover {
-  background: var(--bg-hover);
-  border: 2px solid transparent;
-  background-image: linear-gradient(var(--bg-hover), var(--bg-hover)),
-    linear-gradient(
-      135deg,
-      var(--gradient-hover-start) 0%,
-      var(--gradient-hover-end) 100%
-    );
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-}
-
-.content-item.active {
-  background: var(--bg-active);
-  border: 2px solid transparent;
-  background-image: linear-gradient(var(--bg-active), var(--bg-active)),
-    linear-gradient(
-      135deg,
-      var(--gradient-active-start) 0%,
-      var(--gradient-active-end) 100%
-    );
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  box-shadow: 0 3px 10px rgba(0, 136, 255, 0.2);
-}
-
 .item-icon {
   width: 42px;
   height: 42px;
@@ -956,6 +1156,14 @@ const exportData = () => {
   flex-shrink: 0;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
     0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.item-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 4px;
 }
 
 .item-content {

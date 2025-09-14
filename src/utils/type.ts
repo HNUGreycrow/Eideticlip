@@ -26,8 +26,22 @@ export interface clipboardAPI {
   // 数据库操作API
   saveItem: (item: ClipboardItem) => Promise<void>;
   deleteItem: (id: number) => Promise<boolean>;
+  deleteBatch(idsToDelete: number[]): Promise<{
+    success: boolean;
+    deletedCount: number;
+    failedIds: number[];
+  }>;
   clearAll: () => Promise<boolean>;
-  getHistory: (page: number, pageSize: number, type: string) => Promise<{items: ClipboardItem[], total: number, page: number, pageSize: number}>;
+  getHistory: (
+    page: number,
+    pageSize: number,
+    type: string
+  ) => Promise<{
+    items: ClipboardItem[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }>;
   // 收藏相关API
   setFavorite: (id: number, isFavorite: boolean) => Promise<boolean>;
   getFavorites: () => Promise<ClipboardItem[]>;
@@ -43,10 +57,12 @@ export interface IpcRendererAPI {
 
 // 更新服务类型定义
 export interface UpdateControls {
-  checkForUpdates: () => Promise<any>
-  downloadUpdate: () => Promise<boolean | { error: any }>
-  installUpdate: () => Promise<boolean>
-  setAutoUpdate: (enabled: boolean) => Promise<boolean>
-  getAutoUpdate: () => Promise<boolean>
-  onUpdateStatus: (callback: (status: { status: string, data?: any }) => void) => () => void
+  checkForUpdates: () => Promise<any>;
+  downloadUpdate: () => Promise<boolean | { error: any }>;
+  installUpdate: () => Promise<boolean>;
+  setAutoUpdate: (enabled: boolean) => Promise<boolean>;
+  getAutoUpdate: () => Promise<boolean>;
+  onUpdateStatus: (
+    callback: (status: { status: string; data?: any }) => void
+  ) => () => void;
 }

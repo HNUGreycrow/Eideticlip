@@ -55,6 +55,7 @@ contextBridge.exposeInMainWorld('clipboard', {
   // 剪贴板历史记录相关API
   saveItem: (item: any) => ipcRenderer.invoke('clipboard-save-item', item),
   deleteItem: (id: number) => ipcRenderer.invoke('clipboard-delete-item', id),
+  deleteBatch: (ids: number[]) => ipcRenderer.invoke('clipboard-delete-batch', ids),
   clearAll: () => ipcRenderer.invoke('clipboard-clear-all'),
   getHistory: (page: number, pageSize: number, type: string) => ipcRenderer.invoke('clipboard-get-history', page, pageSize, type),
   // 收藏相关API

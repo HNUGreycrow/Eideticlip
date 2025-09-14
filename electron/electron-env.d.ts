@@ -32,6 +32,11 @@ interface Window {
     onMaximizeChange: (callback: (isMaximized: boolean) => void) => () => void
   }
   clipboard: {
+    deleteBatch(idsToDelete: number[]): Promise<{
+      success: boolean
+      deletedCount: number
+      failedIds: number[]
+    }>
     setFavorite: (id: number, isFavorite: boolean) => Promise<boolean>
     read: () => Promise<string>
     write: (text: string) => Promise<void>
