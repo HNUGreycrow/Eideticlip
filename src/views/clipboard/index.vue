@@ -686,7 +686,7 @@ const deleteBatchItems = () => {
                 :disabled="selectedCount === 0"
                 @click="deleteBatchItems"
               >
-                <i-ep-delete style="margin-right: 3px" /> 删除选中 ({{
+                <i-ep-delete class="el-icon--left" /> 删除选中 ({{
                   selectedCount
                 }})
               </el-button>
@@ -697,18 +697,23 @@ const deleteBatchItems = () => {
           </template>
           <template v-else>
             <el-button class="action-btn" @click="toggleSelectionMode">
-              <i-ep-select style="margin-right: 3px" /> 批量选择
+              <i-ep-select class="el-icon--left" /> 批量选择
             </el-button>
-            <el-button class="action-btn" @click="clearAll">
-              <i-ep-delete style="margin-right: 3px" /> 清空
-            </el-button>
-            <el-button
-              type="primary"
-              class="action-btn primary"
-              @click="exportData"
-            >
-              <i-ep-upload style="margin-right: 3px" /> 导出
-            </el-button>
+            <el-dropdown trigger="click">
+              <el-button>
+                更多<el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="clearAll">
+                    <i-ep-delete class="el-icon--left" />清空
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="exportData">
+                    <i-ep-upload class="el-icon--left" />导出
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </div>
       </div>

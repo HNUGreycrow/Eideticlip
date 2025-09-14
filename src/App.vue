@@ -82,6 +82,7 @@ body,
   --el-button-bg-color: var(--bg-tertiary);
   --el-button-text-color: var(--text-primary);
   --el-button-border-color: var(--border-light);
+  --el-button-active-border-color: var(--el-button-border-color);
   --el-button-hover-bg-color: var(--bg-hover);
   --el-button-hover-text-color: var(--text-primary);
   --el-button-hover-border-color: var(--border-medium);
@@ -106,5 +107,10 @@ body,
 
 .el-input__inner {
   color: var(--text-primary);
+}
+
+/* 下拉菜单项 */
+.el-dropdown-menu__item {
+  --el-dropdown-menuItem-hover-fill: var(--bg-hover)
 }
 </style>
