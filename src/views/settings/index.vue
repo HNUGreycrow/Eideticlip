@@ -315,6 +315,7 @@ const viewChangelog = () => {
 
 .setting-card {
   border-radius: 8px;
+  border-color: var(--border-light);
   background: var(--bg-secondary);
 }
 

@@ -1114,8 +1114,8 @@ const deleteBatchItems = () => {
     background-image: linear-gradient(var(--bg-hover), var(--bg-hover)),
       linear-gradient(
         135deg,
-        var(--gradient-hover-start) 0%,
-        var(--gradient-hover-end) 100%
+        var(--gradient-active-start) 0%,
+        var(--gradient-active-end) 100%
       );
     background-origin: border-box;
     background-clip: padding-box, border-box;

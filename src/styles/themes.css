@@ -12,9 +12,9 @@
   --el-text-color-regular: #b3b3b3; /* 普通文本 */
   --el-text-color-secondary: #777777; /* 次文本/提示 */
 
-  --el-border-color: #333333;
-  --el-border-color-light: #3c3c3c;
-  --el-border-color-lighter: #2c2c2c;
+  --el-border-color: #2c2c2c;
+  --el-border-color-light: #333333;
+  --el-border-color-lighter: #3c3c3c;
 
   --el-fill-color: #252525; /* 表单填充、列表项 hover */
   --el-fill-color-light: #2a2a2a;
@@ -57,10 +57,8 @@
   --accent-yellow: var(--accent-quaternary);
 
   /* 渐变色边框变量 - 深色主题 */
-  --gradient-hover-start: var(--accent-tertiary);
-  --gradient-hover-end: var(--accent-primary);
-  --gradient-active-start: var(--accent-primary);
-  --gradient-active-end: var(--accent-secondary);
+  --gradient-active-start: var(--accent-tertiary);
+  --gradient-active-end: var(--accent-primary);
 
   /* 收藏项目颜色 */
   --favorite-bg: rgba(255, 217, 102, 0.06);
@@ -89,7 +87,7 @@
 :root.light {
   /* Element Plus 官方变量 */
   --el-color-primary-rgb: 91, 147, 255;
-  --el-color-primary: #0084ff;
+  --el-color-primary: #409EFF;
 
   --el-bg-color: #faf9f7; /* 页面背景，比纯白柔和 */
   --el-bg-color-overlay: #f7f5f3; /* 卡片 / 弹窗 */
@@ -99,9 +97,9 @@
   --el-text-color-regular: #5c5c5c;
   --el-text-color-secondary: #8a8a8a;
 
-  --el-border-color: #c0c4cc;
-  --el-border-color-light: #d0d4dc;
-  --el-border-color-lighter: #e0e3ea;
+  --el-border-color: #CDD0D6;
+  --el-border-color-light: #D4D7DE;
+  --el-border-color-lighter: #DCDFE6;
 
   --el-fill-color: #f2f0ed;
   --el-fill-color-light: #f7f5f3;
@@ -124,20 +122,28 @@
   --text-inverse: #ffffff; /* 用于浅色背景上的"反色"文字 */
 
   /* 边框颜色 */
-  --border-light: #d0d4dc;
-  --border-medium: #e0e3ea;
+  --border-light: var(--el-border-color-light);
+  --border-medium: var(--el-border-color);
 
   /* 强调色保持不变，但需要定义悬停状态 */
-  --accent-primary-hover: #4a85f5; /* 按钮悬停状态 */
+  --accent-primary-hover: #1565c0; /* 按钮悬停状态，与新的accent-primary协调 */
   
+  /* 强调色 - 浅色主题专用，更适合白色背景 */
+  --accent-primary: #409EFF; 
+  --accent-secondary: #2e7d32; /* 更深的绿色，提高对比度 */
+  --accent-tertiary: #7b1fa2; /* 更深的紫色 */
+  --accent-quaternary: #f57c00; /* 更深的橙色 */
+
   /* 兼容性变量（保持与其他主题一致的变量名） */
   --accent-blue-hover: var(--accent-primary-hover);
+  --accent-blue: var(--accent-primary);
+  --accent-green: var(--accent-secondary);
+  --accent-purple: var(--accent-tertiary);
+  --accent-yellow: var(--accent-quaternary);
 
   /* 渐变色边框变量 - 浅色主题 */
-  --gradient-hover-start: var(--accent-primary);
-  --gradient-hover-end: var(--accent-secondary);
-  --gradient-active-start: var(--accent-primary-hover);
-  --gradient-active-end: var(--accent-tertiary);
+  --gradient-active-start: var(--accent-primary);
+  --gradient-active-end: var(--el-color-primary);
 
   /* 收藏项目颜色 - 浅色主题专用 */
   --favorite-bg: rgba(255, 217, 102, 0.06);
@@ -149,7 +155,7 @@
   --type-url-bg: rgba(66, 184, 131, 0.15);
   --type-code-bg: rgba(139, 92, 246, 0.15);
   --type-image-bg: rgba(255, 71, 87, 0.15);
-  --type-favorite-bg: rgba(240, 192, 0, 0.15);
+  --type-favorite-bg: rgba(240, 192, 0, 0.20);
 }
 
 /* ===== 粉色主题 ===== */
@@ -222,8 +228,6 @@
   --accent-yellow: #ff8a65;
 
   /* 渐变色边框变量 - 粉色主题 */
-  --gradient-hover-start: #ff9a9e;
-  --gradient-hover-end: #fecfef;
   --gradient-active-start: var(--accent-primary);
   --gradient-active-end: var(--accent-tertiary);
 }
@@ -299,8 +303,6 @@
   --accent-yellow: var(--accent-quaternary);
 
   /* 渐变色边框变量 - 橙色主题 */
-  --gradient-hover-start: #ffb74d;
-  --gradient-hover-end: var(--accent-quaternary);
   --gradient-active-start: var(--accent-primary);
   --gradient-active-end: var(--accent-danger);
 }
