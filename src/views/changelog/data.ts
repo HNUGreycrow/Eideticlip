@@ -9,6 +9,22 @@ export interface ChangelogItem {
 
 export const changelogData: ChangelogItem[] = [
   {
+    version: "v1.2.0",
+    date: "2025-09-16",
+    categories: [
+      {
+        name: "新功能",
+        items: ["新增批量删除功能"],
+      },
+      {
+        name: "优化",
+        items: [
+          "剪切记录界面右上角按钮布局优化",
+        ],
+      },
+    ],
+  },
+  {
     version: "v1.1.3",
     date: "2025-09-14",
     categories: [
