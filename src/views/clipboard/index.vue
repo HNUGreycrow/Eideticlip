@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, watch } from "vue";
+import { computed, ref, onMounted, onUnmounted, watch, shallowRef } from "vue";
 import DetailPanel from "./components/DetailPanel.vue";
 import { ClipboardItem } from "@/utils/type";
 import {
@@ -22,11 +22,11 @@ const selectedItem = ref<ClipboardItem | null>(null);
 const clipboardWatcherActive = ref(true); // 默认开启剪贴板监听
 let clipboardWatcherCleanup: (() => void) | null = null; // 剪贴板监听清理函数
 
-// 剪贴板数据
-const clipboardData = ref<ClipboardItem[]>([]);
+// 剪贴板数据 - 使用 shallowRef 减少深度响应式开销
+const clipboardData = shallowRef<ClipboardItem[]>([]);
 
-// 批量选择相关状态
-const selectedIds = ref<Set<number>>(new Set());
+// 批量选择相关状态 - 使用 shallowRef 优化 Set 性能
+const selectedIds = shallowRef<Set<number>>(new Set());
 const isSelectionMode = ref(false);
 
 // 监听类型过滤器变化，重新加载数据

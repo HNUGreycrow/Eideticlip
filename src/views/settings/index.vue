@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { themeService } from "../../utils/theme";
 import type { ThemeType } from "../../utils/theme";
 import { useRouter } from "vue-router";
@@ -165,6 +165,15 @@ const checkForUpdates = async () => {
 const viewChangelog = () => {
   router.push('/changelog');
 };
+
+// 组件卸载时清理资源
+onUnmounted(() => {
+  // 清理更新监听器
+  if (removeListener) {
+    removeListener();
+    removeListener = null;
+  }
+});
 </script>
 
 <template>

@@ -16,17 +16,17 @@
           <i-ep-Picture v-else-if="item.type === 'image'" />
           <i-ep-Document v-else />
         </div>
-        <span class="detail-type-label">{{ getTypeLabel(item.type) }}</span>
+        <span class="detail-type-label">{{ typeLabel }}</span>
       </div>
 
       <div class="detail-text">
-        <p>{{ item.content }}</p>
+        <p>{{ displayContent }}</p>
       </div>
 
       <div class="detail-meta">
         <div class="detail-meta-item">
           <span class="meta-label">创建时间</span>
-          <span class="meta-value">{{ formatTime(item.timestamp) }}</span>
+          <span class="meta-value">{{ formattedTime }}</span>
         </div>
       </div>
 
@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { ClipboardItem } from "@/utils/type";
 import { formatTime, getTypeLabel } from "@/utils/utils";
 
@@ -79,6 +80,28 @@ const emit = defineEmits<{
   delete: [item: Item];
   favorite: [item: Item];
 }>();
+
+// 优化：使用计算属性缓存格式化结果，避免重复计算
+const formattedTime = computed(() => {
+  return props.item ? formatTime(props.item.timestamp) : "";
+});
+
+const typeLabel = computed(() => {
+  return props.item ? getTypeLabel(props.item.type) : "";
+});
+
+// 优化：截断长文本内容，避免渲染大量文本导致的性能问题
+const MAX_CONTENT_LENGTH = 5000;
+const displayContent = computed(() => {
+  if (!props.item?.content) return "";
+  const content = props.item.content;
+  if (content.length > MAX_CONTENT_LENGTH) {
+    return (
+      content.substring(0, MAX_CONTENT_LENGTH) + "...\n\n[内容过长，已截断显示]"
+    );
+  }
+  return content;
+});
 
 const closeDetail = () => {
   emit("close");
